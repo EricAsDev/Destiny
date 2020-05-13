@@ -1,0 +1,14 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:textViewStyle">@style/DestinyFont</item>
+    </style>
+    <style name="DestinyFont" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/destiny_symbols</item>
+    </style>
+
+</resources>

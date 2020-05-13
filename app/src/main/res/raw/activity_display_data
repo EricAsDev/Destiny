@@ -1,0 +1,292 @@
+{
+  	"31":{
+		"name":"Supremacy",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Created",
+			"":"Secured",
+			"":"Secure Rate",
+			"":"Efficiency"
+		}
+	},
+	"37":{
+		"name":"Survival",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"opponentsDefeated":"Opp. Def",
+			"":"Knockouts",
+			"":"Streak",
+			"":"Damage",
+			"efficiency":"Efficiency"
+		}
+	},
+	"38":{
+		"name":"Countdown",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Arms",
+			"":"Disarms",
+			"":"Damage",
+			"":"Efficiency"
+		}
+	},
+	"43":{
+		"name":"Iron Banner Control",
+		"matchmaking":{
+			"maxParty":6,
+			"maxPlayers":12,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Advantage",
+			"":"Power Play",
+			"":"Captures",
+			"":"Efficiency"
+		}
+	},
+	"44":{
+		"name":"Iron Banner Clash",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Streak",
+			"":"Multi",
+			"":"Damage",
+			"":"Efficiency"
+		}
+	},
+	"48":{
+		"name":"Rumble",
+		"matchmaking":{
+			"maxParty":-1,
+			"maxPlayers":6,
+			"isTeamBased":false,
+			"teamCount":-1
+		},
+		"pgcrDisplayData":{
+			"":"Score",
+			"":"Efficiency",
+			"":"Damage",
+			"":"Streak",
+			"":"Multi"
+		}
+	},
+	"50":{
+		"name":"Doubles",
+		"matchmaking":{
+			"maxParty":2,
+			"maxPlayers":4,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Round 1",
+			"":"Round 2",
+			"":"Round 3",
+			"":"Round 4",
+			"":"Efficiency"
+		}
+	},
+	"51":{
+		"name":"Private Clash"
+	},
+	"52":{
+		"name":"Private Control"
+	},
+	"53":{
+		"name":"Private Supremacy"
+	},
+	"54":{
+		"name":"Private Countdown"
+	},
+	"55":{
+		"name":"Private Survival"
+	},
+	"56":{
+		"name":"Private Mayhem"
+	},
+	"57":{
+		"name":"Private Rumble"
+	},
+	"59":{
+		"name":"Showdown",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Round 1",
+			"":"Round 2",
+			"":"Round 3",
+			"":"Round 4",
+			"":"Damage"
+		}
+	},
+	"60":{
+		"name":"Lockdown",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Streak",
+			"":"Multi",
+			"":"Damage",
+			"":"Efficiency"
+		}
+	},
+	"61":{
+		"name":"Scorched",
+		"matchmaking":{
+			"maxParty":-1,
+			"maxPlayers":6,
+			"isTeamBased":false,
+			"teamCount":-1
+		},
+		"pgcrDisplayData":{
+			"":"Score",
+			"":"Efficiency",
+			"":"Damage",
+			"":"Streak",
+			"":"Multi"
+		}
+	},
+	"62":{
+		"name":"Team Scorched",
+		"matchmaking":{
+			"maxParty":6,
+			"maxPlayers":12,
+			"isTeamBased":true,
+			"teamCount":1
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Streak",
+			"":"Multi",
+			"":"Damage",
+			"":"Efficiency"
+		}
+	},
+	"63":{
+		"name":"Gambit"
+	},
+	"65":{
+		"name":"BreakThrough",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Deployed",
+			"":"Hacked",
+			"":"Opp. Def.",
+			"":"Damage",
+			"":"Efficiency"
+		}
+	},
+	"67":{
+		"name":"Salvage"
+	},
+	"68":{
+		"name":"Iron Banner Salvage"
+	},
+	"71":{
+		"name":"Clash Quickplay",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Streak",
+			"":"Multi",
+			"":"Damage",
+			"":"Efficiency"
+		}
+	},
+	"72":{
+		"name":"Clash Competitive",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Streak",
+			"":"Multi",
+			"":"Damage",
+			"":"Efficiency"
+		}
+	},
+	"73":{
+		"name":"Control Quickplay",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Advantage",
+			"":"Power Play",
+			"":"Captures",
+			"":"Efficiency"
+		}
+	},
+	"74":{
+		"name":"Control Competitive",
+		"matchmaking":{
+			"maxParty":4,
+			"maxPlayers":8,
+			"isTeamBased":true,
+			"teamCount":2
+		},
+		"pgcrDisplayData":{
+			"":"Opp. Def",
+			"":"Advantage",
+			"":"Power Play",
+			"":"Captures",
+			"":"Efficiency"
+		}
+	},
+	"75":{
+		"name":"Gambit Prime"
+	}
+}
+	

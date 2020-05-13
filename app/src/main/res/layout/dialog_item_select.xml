@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_constraintWidth_percent=".9"
+    app:layout_constraintHeight_percent=".9"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/class_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="false"
+        android:cropToPadding="false"
+        android:scaleType="centerCrop"
+        android:src="@drawable/characterback"/>
+
+    <SearchView
+        android:id="@+id/picker_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </SearchView>
+
+    <TextView
+        android:id="@+id/picker_button_equip"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="center_horizontal"
+        android:text="@string/picker_button_equip"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/picker_button_vault" />
+
+    <TextView
+        android:id="@+id/picker_button_vault"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="@string/picker_button_vault"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/picker_button_equip"
+        app:layout_constraintStart_toEndOf="@+id/picker_button_cancel" />
+
+    <TextView
+        android:id="@+id/picker_button_cancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="center_horizontal"
+        android:text="@string/picker_button_cancel"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/picker_button_vault"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/picker_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/picker_search"
+        app:layout_constraintBottom_toTopOf="@+id/picker_button_equip"
+        android:requiresFadingEdge="vertical"/>
+
+    <ProgressBar
+        android:id="@+id/select_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:progressTint="@android:color/darker_gray"
+        android:secondaryProgressTintMode="src_atop"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

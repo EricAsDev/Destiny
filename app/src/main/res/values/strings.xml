@@ -1,0 +1,82 @@
+<resources>
+    <string name="app_name">Destiny</string>
+    <string name="x_api_key">bcef02420fd647ab8fbd877e83523273</string>
+    <string name="client_id">22914</string>
+
+    <string name="request_url">https://www.bungie.net/Platform/</string>
+    <string name="stats_url">https://stats.bungie.net/Platform/</string>
+    <string name="request_auth_url">https://www.bungie.net/en/oauth/authorize?client_id=</string>
+    <string name="request_token_url">https://www.bungie.net/platform/app/oauth/token/</string>
+    <string name="login">Logging in</string>
+    <string name="get_manifest">Verifying Resources</string>
+    <string name="get_database">Updating Content</string>
+    <string name="start_main">Preparing</string>
+
+    <string name="placeholder_select">select character</string>
+    <string name="placeholder_name">player name</string>
+    <string name="placeholder_clan">clan name</string>
+    <string name="placeholder_clan_constant">clan // </string>
+
+    <string name="menu_vault">Vault</string>
+    <string name="menu_crucible_rank">Crucible Ranks</string>
+    <string name="menu_inventory">Inventory</string>
+    <string name="menu_crucible">Crucible Ranks</string>
+    <string name="menu_triumphs">Triumphs &amp; Seals</string>
+    <string name="menu_gear">Gear</string>
+    <string name="menu_loadouts">Loadouts</string>
+
+    <string name="character_power">Power</string>
+    <string name="character_power_value">100</string>
+    <string name="character_mobility">Mobility</string>
+    <string name="character_resilience">Resilience</string>
+    <string name="character_recovery">Recovery</string>
+
+    <string name="character_mobility_value">0</string>
+    <string name="character_resilience_value">0</string>
+    <string name="character_recovery_value">0</string>
+
+    <string name="item_name">Item Name Holder</string>
+    <string name="item_type">Item Type Holder</string>
+    <string name="item_power">500</string>
+
+    <string name="ts_fragment">Triumphs</string>
+    <string name="ts_seals">Seals</string>
+
+    <string name="pursuits_fragment">Pursuits</string>
+
+    <string name="fixed_hash_pursuits">1345459588</string>
+    <string name="fixed_hash_seals">1652422747</string>
+    <string name="fixed_hash_triumphs">1024788583</string>
+    <string name="fixed_hash_vault_vendor">1037843411</string>
+    <string name="fixed_hash_vault_bucket">138197802</string>
+    <string name="fixed_category_armor">1</string>
+    <string name="fixed_hash_postmaster">215593132</string> <!-- Lost Items -->
+    <string name="fixed_hash_glory_streak">2572719399</string>
+    <string name="fixed_hash_valor_streak">2203850209</string>
+    <string name="fixed_hash_glory_detailed">2000925172</string>
+    <string name="fixed_hash_valor_detailed">2626549951</string>
+    <string name="fixed_hash_glory">2679551909</string>
+    <string name="fixed_hash_valor">3882308435</string>
+    <string name="fixed_hash_gambit">2772425241</string>
+    <string name="fixed_tierTypeHash_exotic">2759499571</string>
+
+    <string name="completed_record">\u0020(Completed)</string>
+
+    <string name="no_tracked_pursuit">No pursuits being tracked</string>
+    <string name="pursuit_tracked">Tracked Pursuit</string>
+    <string name="pursuit_list">List</string>
+
+    <string name="picker_button_equip">Equip Item</string>
+    <string name="picker_button_cancel">Cancel</string>
+    <string name="picker_button_vault">Send to Vault</string>
+
+    <string name="character_picker_title">Select Character</string>
+    <string name="character_picker_button_ok">Select</string>
+    <string name="character_picker_button_cancel">Cancel</string>
+
+    <string name="crucible_alpha">Alpha</string>
+    <string name="crucible_bravo">Bravo</string>
+
+    <string name="rewards_title">REWARDS:</string>
+
+</resources>

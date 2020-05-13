@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- super -->
+    <string name="fist_of_havoc">\uE122</string>
+    <string name="meteor_strike">\uE058</string>
+    <string name="void_titan_super">\uE128</string>
+    <string name="void_shield">\uE061</string>
+    <string name="solar_titan_super">\uE126</string>
+    <string name="thermal_maul">\uE060</string>
+    <string name="golden_gun">\uE123</string>
+    <string name="thermal_knifes">\uE062</string>
+    <string name="hunter_staff">\uE121</string>
+    <string name="arc_staff">\uE063</string>
+    <string name="void_hunter_super">\uE127</string>
+    <string name="void_blades">\uE057</string>
+    <string name="nova_bomb">\uE120</string>
+    <string name="nova_pulse">\uE064</string>
+    <string name="warlock_blade">\uE119</string>
+    <string name="healing_sword">\uE056</string>
+    <string name="arc_warlock_super">\uE125</string>
+    <string name="arc_beam">\uE065</string>
+    <!--ability-->
+    <string name="grenade">\uE111</string>
+    <string name="melee">\uE110</string>
+    <string name="hammer_throw_melee">\uE067</string>
+    <string name="throwing_knife">\uE124</string>
+    <string name="hunter_smoke">\uE112</string>
+    <string name="arc_drone">\uE118</string>
+    <!--weapon-->
+    <string name="auto_rifle">\uE100</string>
+    <string name="bow">\uE099</string>
+    <string name="hand_cannon">\uE103</string>
+    <string name="pulse_rifle">\uE101</string>
+    <string name="scout_rifle">\uE102</string>
+    <string name="sidearm">\uE109</string>
+    <string name="smg">\uE107</string>
+    <string name="fusion_rifle">\uE106</string>
+    <string name="shotgun">\uE104</string>
+    <string name="sniper_rifle">\uE105</string>
+    <string name="beam_weapon">\uE138</string>
+    <string name="grenade_launcher">\uE113</string>
+    <string name="wire_rifle">\uE152</string>
+    <string name="machinegun">\uE154</string>
+    <string name="rocket_launcher">\uE108</string>
+    <string name="sword">\uE153</string>
+    <string name="grenade_launcher_field_forged">\uE155</string>
+    <string name="cabal_rifle">\uE150</string>
+    <string name="shrapnel_launcher">\uE151</string>
+    <string name="spear_launcher">\uE136</string>
+    <string name="valkyrie">\uE066</string>
+    <string name="shield_artifact">\uE134</string>
+    <!--vehicle-->
+    <string name="turret" >\uE130</string>
+    <string name="pike">\uE131</string>
+    <string name="interceptor">\uE132</string>
+    <string name="sparrow">\uE133</string>
+    <string name="loader_tank">\uE135</string>
+    <string name="guardian_tank">\uE137</string>
+    <!--element-->
+    <string name="thermal">\uE140</string>
+    <string name="arc">\uE143</string>
+    <!--<string name="void">\uE144</string>-->
+    <!--UI-->
+    <string name="settings">\uE059</string>
+    <string name="light">\uE052</string>
+    <string name="small_blocker">\uE053</string>
+    <string name="medium_blocker">\uE054</string>
+    <string name="large_blocker">\uE055</string>
+    <string name="xl_blocker">\uE068</string>
+    <string name="Invasion">\uE069</string>
+    <string name="combat_role_pierce">\uE070</string>
+    <string name="combat_role_overload">\uE071</string>
+    <string name="combat_role_stagger">\uE072</string>
+    <string name="quest">\uE075</string>
+    <string name="environment_hazard">\uE141</string>
+    <string name="headshot">\uE142</string>
+</resources>

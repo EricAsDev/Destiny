@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="exotic">#ceae33</color>
+    <color name="legendary">#522f65</color>
+    <color name="rare">#5076a3</color>
+    <color name="common">#366f42</color>
+    <color name="basic">#c3bcb4</color>
+    <color name="no_tier">#ffffff</color>
+
+</resources>

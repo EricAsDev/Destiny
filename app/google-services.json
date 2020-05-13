@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "234554187429",
+    "firebase_url": "https://destiny-2-loadouts.firebaseio.com",
+    "project_id": "destiny-2-loadouts",
+    "storage_bucket": "destiny-2-loadouts.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234554187429:android:106f45701582f947b0774c",
+        "android_client_info": {
+          "package_name": "bungo.destiny"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "234554187429-qpveq55gi6mr0mhmfu22vndmv823hhkj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHvxHSyMXJLUuiZ7iAR-XEOkBqgq0-1TA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "234554187429-qpveq55gi6mr0mhmfu22vndmv823hhkj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
