@@ -127,20 +127,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
         step_recycler.setLayoutManager(layOutManager);
         step_recycler.setAdapter(stepsAdapter);
     }
-/*
-    private JSONArray getObjectives () { //this is each objective to complete a quest step
-        JSONArray objectiveHashes = new JSONArray();
-        try {
-            if (itemDefinition.has("objectives")) {
-                objectiveHashes = itemDefinition.getJSONObject("objectives").getJSONArray("objectiveHashes");
-                //Log.d("Objective Hashes", objectiveHashes.toString());
-            }
-        } catch (Exception e) {
-            Log.d("Get Objectives", e.toString());
-        }
-        return objectiveHashes;
-    }
-*/
+
     private void setRewards (View view) {
         //rewards are for bounties only. where are the rewards for QUESTS?
         //rewards are found in the item definition, "value" object. See DestinyItemValueBlockDefinition
@@ -267,9 +254,9 @@ public class ActivityQuestDetail extends AppCompatActivity {
             try {
                 String stepHash = data.getJSONObject(position).getString("itemHash");
                 String signedStepHash = ActivityMain.context.getSignedHash(stepHash);
-                Log.d("Step Hash", signedStepHash);
 
                 JSONObject stepDefinition = new JSONObject(ActivityMain.context.defineElement(signedStepHash, "DestinyInventoryItemDefinition"));
+                Log.d(stepHash, stepDefinition.toString());
                 String stepText = stepDefinition.getJSONObject("displayProperties").getString("name");
                 String displaySource = stepDefinition.getString("displaySource");
                 String description = stepDefinition.getJSONObject("displayProperties").getString("description");
@@ -286,8 +273,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 } else {
                     Toast.makeText(context, "No Objectives", Toast.LENGTH_LONG).show();
                 }
-
-
 
             } catch (Exception e) {
                 Log.d("Step", e.toString());
