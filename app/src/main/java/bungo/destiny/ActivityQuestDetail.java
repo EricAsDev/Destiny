@@ -46,10 +46,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
         setContentView(R.layout.activity_quest_detail);
         context = this;
 
-        //commit test. please work
-
         View titleLayout = findViewById(R.id.layout_title);
-        titleLayout = findViewById(R.id.layout_title);
        // View displaySourceLayout = findViewById(R.id.layout_source);
         View objectivesLayout = findViewById(R.id.layout_objectives);
         View rewardsLayout = findViewById(R.id.layout_rewards);
