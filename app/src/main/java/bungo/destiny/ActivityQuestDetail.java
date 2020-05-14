@@ -2,6 +2,7 @@ package bungo.destiny;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,6 +41,9 @@ public class ActivityQuestDetail extends AppCompatActivity {
     public String characterId;
     public Context context;
 
+    int stepPosition; // to be used to position step recycler to current step
+    int trackingValue;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +53,8 @@ public class ActivityQuestDetail extends AppCompatActivity {
         View titleLayout = findViewById(R.id.layout_title);
        // View displaySourceLayout = findViewById(R.id.layout_source);
         View objectivesLayout = findViewById(R.id.layout_objectives);
-        View rewardsLayout = findViewById(R.id.layout_rewards);
+        //View rewardsLayout = findViewById(R.id.layout_rewards);
+        View rewardsLayout = findViewById(R.id.rewards);
         //View descriptionLayout = findViewById(R.id.layout_description);
         //View descriptionLayout = findViewById(R.id.layout_description);
 
@@ -61,6 +66,8 @@ public class ActivityQuestDetail extends AppCompatActivity {
             String itemHash = inventoryItem.getString("itemHash");
             String signedHash = ActivityMain.context.getSignedHash(itemHash);
             itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyInventoryItemDefinition"));
+            trackingValue = getTrackingValue(itemHash);
+            stepPosition = getStepPosition(itemHash);
 
             Log.d("item", inventoryItem.toString());
             Log.d("item definition", itemDefinition.toString());
@@ -69,7 +76,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
 
             setSteps(objectivesLayout);
 
-            setRewards(rewardsLayout);
+            setRewards(objectivesLayout);
 
         } catch (Exception e) {
             Log.d("Quest Detail", e.toString());
@@ -126,16 +133,18 @@ public class ActivityQuestDetail extends AppCompatActivity {
         pagerSnapHelper.attachToRecyclerView(step_recycler);
         step_recycler.setLayoutManager(layOutManager);
         step_recycler.setAdapter(stepsAdapter);
+        layOutManager.scrollToPosition(stepPosition);
+
     }
 
     private void setRewards (View view) {
         //rewards are for bounties only. where are the rewards for QUESTS?
         //rewards are found in the item definition, "value" object. See DestinyItemValueBlockDefinition
-        RecyclerView reward_recycler = view.findViewById(R.id.recycler_rewards);
+        View rewardsView = view.findViewById(R.id.layout_rewards);
+        RecyclerView reward_recycler = rewardsView.findViewById(R.id.recycler_rewards);
         try {
             if (itemDefinition.has("value")) {
-                view.setVisibility(View.VISIBLE);
-
+                rewardsView.setVisibility(View.VISIBLE);
                 JSONArray itemValue = itemDefinition.getJSONObject("value").getJSONArray("itemValue");
                 JSONArray rewards = new JSONArray();
                 for (int i = 0; i < itemValue.length(); i++) {
@@ -213,8 +222,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
     class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.ViewHolder> {
         private LayoutInflater layoutInflater;
         JSONArray data;
-        int step;
-        int trackingValue;
         ViewHolder viewHolder;
 
         StepsAdapter(Context context, JSONObject data){
@@ -223,13 +230,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 if (data.has("setData")) {
                     //setData means item is a quest and has multiple steps
                     this.data = data.getJSONObject("setData").getJSONArray("itemList");
-                    for (int i = 0; i < this.data.length(); i++) {
-                        if (this.data.getJSONObject(i).getString("itemHash").equals(inventoryItem.getString("itemHash"))) {
-                            step = i;
-                            trackingValue = this.data.getJSONObject(i).getInt("trackingValue");
-                            break;
-                        }
-                    }
+
                 } else {
                     //no step data so, only one thing to do. put the itemHash here instead
                     JSONObject stepData = new JSONObject().put("itemHash", inventoryItem.getJSONObject("inventoryItem").getString("itemHash"));
@@ -245,6 +246,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
         @NonNull
         public StepsAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
             final View view = layoutInflater.inflate(R.layout.quest_step, parent, false);
+            setRewards(view);
             return new ViewHolder(view);
         }
 
@@ -258,16 +260,16 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 JSONObject stepDefinition = new JSONObject(ActivityMain.context.defineElement(signedStepHash, "DestinyInventoryItemDefinition"));
                 Log.d(stepHash, stepDefinition.toString());
                 String stepText = stepDefinition.getJSONObject("displayProperties").getString("name");
-                String displaySource = stepDefinition.getString("displaySource");
                 String description = stepDefinition.getJSONObject("displayProperties").getString("description");
-                viewHolder.step_text.setText(description);
+                String displaySource = stepDefinition.getString("displaySource");
+                viewHolder.step_text.setText(stepText);
+                viewHolder.step_description.setText(description);
                 viewHolder.step_displaySource.setText(displaySource);
-                //viewHolder.step_text.setText(stepText);
 
                 if (stepDefinition.has("objectives")) {
-                    JSONArray objectiveHashes = stepDefinition.getJSONObject("objectives").getJSONArray("objectiveHashes");
+                    //JSONArray objectiveHashes = stepDefinition.getJSONObject("objectives").getJSONArray("objectiveHashes");
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ActivityQuestDetail.this, LinearLayoutManager.VERTICAL, false);
-                    ObjectivesAdapter objectivesAdapter = new ObjectivesAdapter(ActivityQuestDetail.this, objectiveHashes);
+                    ObjectivesAdapter objectivesAdapter = new ObjectivesAdapter(ActivityQuestDetail.this, stepDefinition);
                     viewHolder.step_recycler.setAdapter(objectivesAdapter);
                     viewHolder.step_recycler.setLayoutManager(layoutManager);
                 } else {
@@ -287,13 +289,17 @@ public class ActivityQuestDetail extends AppCompatActivity {
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView step_text;
             TextView step_displaySource;
+            TextView step_description;
             RecyclerView step_recycler;
+            ConstraintLayout step_layout;
 
             ViewHolder(final View itemView) {
                 super(itemView);
-                step_text = itemView.findViewById(R.id.text_description);
+                step_text = itemView.findViewById(R.id.step_text);
+                step_description = itemView.findViewById(R.id.text_description);
                 step_displaySource = itemView.findViewById(R.id.step_displaySource);
                 step_recycler = itemView.findViewById(R.id.step_recycler);
+                step_layout = itemView.findViewById(R.id.step_layout);
             }
         }
     }
@@ -301,12 +307,23 @@ public class ActivityQuestDetail extends AppCompatActivity {
     class ObjectivesAdapter extends RecyclerView.Adapter<ObjectivesAdapter.ViewHolder> {
         private LayoutInflater layoutInflater;
         JSONArray data;
+        boolean stepComplete = false;
         Context context;
 
-        ObjectivesAdapter(Context context, JSONArray data) {
+        ObjectivesAdapter(Context context, JSONObject stepDefinition) {
             this.layoutInflater = LayoutInflater.from(context);
             this.context = context;
-            this.data = data;
+            //this.data = data;
+            try {
+                this.data = stepDefinition.getJSONObject("objectives").getJSONArray("objectiveHashes");
+                Log.d(String.valueOf(trackingValue), String.valueOf(getTrackingValue(stepDefinition.getString("hash"))));
+                if (getTrackingValue(stepDefinition.getString("hash")) < trackingValue) {
+                    Log.d(String.valueOf(trackingValue), String.valueOf(getTrackingValue(stepDefinition.getString("hash"))));
+                    stepComplete = true;
+                }
+            } catch (Exception e) {
+                Log.d("Objectives Adapter", e.toString());
+            }
         }
 
         @Override
@@ -381,11 +398,13 @@ public class ActivityQuestDetail extends AppCompatActivity {
                     }
                 }
 
+                if (stepComplete) {
+                    holder.completeCheckBox.setChecked(true);
+                    holder.completionProgress.setMax(1);
+                    holder.completionProgress.setProgress(1);
+                }
+
                 //completed objectives do not have instance info associated with them.
-
-
-
-
             } catch (Exception e) {
                 Log.d("Objectives Adapter", e.toString());
             }
@@ -458,6 +477,43 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private int getStepPosition (String itemHash) {
+        int stepPosition = 0;
+        try {
+            if (itemDefinition.has("setData")) {
+                JSONArray itemList = itemDefinition.getJSONObject("setData").getJSONArray("itemList");
+                for (int i = 0; i < itemList.length(); i++) {
+                    if (itemList.getJSONObject(i).getString("itemHash").equals(itemHash)) {
+                        stepPosition = i;
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.d("Step Position", e.toString());
+        }
+
+        return stepPosition;
+    }
+
+    private int getTrackingValue (String itemHash) {
+        int trackingValue = 0;
+        try {
+            if (itemDefinition.has("setData")) {
+                JSONArray itemList = itemDefinition.getJSONObject("setData").getJSONArray("itemList");
+                for (int i = 0; i < itemList.length(); i++) {
+                    if (itemList.getJSONObject(i).getString("itemHash").equals(itemHash)) {
+                        trackingValue = itemDefinition.getJSONObject("setData").getJSONArray("itemList").getJSONObject(i).getInt("trackingValue");
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.d("Tracking Value", e.toString());
+        }
+        return trackingValue;
     }
 
     /* value style enum:

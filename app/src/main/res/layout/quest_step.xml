@@ -1,20 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/step_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_gravity="center"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/text_title_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/destiny_symbols_pc"
+        android:textColor="@android:color/white"
+        android:textSize="30sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="TextView" />
+
+    <TextView
+        android:id="@+id/step_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_title_holder"
+        tools:text="TextView" />
+
 
     <TextView
         android:id="@+id/text_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp"
+        android:padding="15dp"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/step_text" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/step_recycler"
@@ -40,6 +64,13 @@
         android:textColor="@android:color/white"
         android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/divider_source" />
+        app:layout_constraintTop_toBottomOf="@+id/divider_source"/>
+
+    <include layout="@layout/rewards_layout"
+        android:id="@+id/rewards"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/step_displaySource"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
