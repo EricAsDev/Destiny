@@ -41,7 +41,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
     public String characterId;
     public Context context;
 
-    int stepPosition; // to be used to position step recycler to current step
+    int stepPosition;
     int trackingValue;
 
     @Override
@@ -50,8 +50,9 @@ public class ActivityQuestDetail extends AppCompatActivity {
         setContentView(R.layout.activity_quest_detail);
         context = this;
 
+
         View titleLayout = findViewById(R.id.layout_title);
-       // View displaySourceLayout = findViewById(R.id.layout_source);
+        //View displaySourceLayout = findViewById(R.id.layout_source);
         View objectivesLayout = findViewById(R.id.layout_objectives);
         //View rewardsLayout = findViewById(R.id.layout_rewards);
         View rewardsLayout = findViewById(R.id.rewards);
@@ -158,7 +159,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 reward_recycler.setLayoutManager(layOutManager);
                 reward_recycler.setAdapter(rewardAdapter);
 
-                //Log.d("rewards", rewards.toString());
             }
         } catch (Exception e) {
             Log.d("Rewards", e.toString());
@@ -266,14 +266,16 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 viewHolder.step_description.setText(description);
                 viewHolder.step_displaySource.setText(displaySource);
 
+                if (!itemDefinition.has("setData")) {
+                    viewHolder.step_text.setText("");
+                }
+
                 if (stepDefinition.has("objectives")) {
                     //JSONArray objectiveHashes = stepDefinition.getJSONObject("objectives").getJSONArray("objectiveHashes");
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ActivityQuestDetail.this, LinearLayoutManager.VERTICAL, false);
                     ObjectivesAdapter objectivesAdapter = new ObjectivesAdapter(ActivityQuestDetail.this, stepDefinition);
                     viewHolder.step_recycler.setAdapter(objectivesAdapter);
                     viewHolder.step_recycler.setLayoutManager(layoutManager);
-                } else {
-                    Toast.makeText(context, "No Objectives", Toast.LENGTH_LONG).show();
                 }
 
             } catch (Exception e) {
@@ -308,6 +310,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
         private LayoutInflater layoutInflater;
         JSONArray data;
         boolean stepComplete = false;
+        boolean stepFuture = false;
         Context context;
 
         ObjectivesAdapter(Context context, JSONObject stepDefinition) {
@@ -316,10 +319,10 @@ public class ActivityQuestDetail extends AppCompatActivity {
             //this.data = data;
             try {
                 this.data = stepDefinition.getJSONObject("objectives").getJSONArray("objectiveHashes");
-                Log.d(String.valueOf(trackingValue), String.valueOf(getTrackingValue(stepDefinition.getString("hash"))));
                 if (getTrackingValue(stepDefinition.getString("hash")) < trackingValue) {
-                    Log.d(String.valueOf(trackingValue), String.valueOf(getTrackingValue(stepDefinition.getString("hash"))));
                     stepComplete = true;
+                } else if (getTrackingValue(stepDefinition.getString("hash")) > trackingValue) {
+                    stepFuture = true;
                 }
             } catch (Exception e) {
                 Log.d("Objectives Adapter", e.toString());
@@ -344,7 +347,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
 
                 String signedHash = ActivityMain.context.getSignedHash(data.getString(position));
                 JSONObject objectiveDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyObjectiveDefinition"));
-                Log.d("Objective Definition", objectiveDefinition.toString());
+                //Log.d("Objective Definition", objectiveDefinition.toString());
                 String progressDescription = objectiveDefinition.getString("progressDescription");
                 String regex = "\\[(.*?)\\]";
                 Pattern pattern = Pattern.compile(regex);
@@ -373,7 +376,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
                             holder.completionProgress.setProgress(unInstancedItemObjective.getJSONObject(i).getInt("progress"));
                             String completionTextValue =
                                     unInstancedItemObjective.getJSONObject(i).getString("progress") + "/" +
-                                    //unInstancedItemObjective.getJSONObject(i).getString("completionValue");
                                     objectiveDefinition.getString("completionValue");
                             holder.completionText.setText(completionTextValue);
                             Log.d("UnInstanced", unInstancedItemObjective.getJSONObject(i).toString());
@@ -402,6 +404,17 @@ public class ActivityQuestDetail extends AppCompatActivity {
                     holder.completeCheckBox.setChecked(true);
                     holder.completionProgress.setMax(1);
                     holder.completionProgress.setProgress(1);
+
+                    Log.d("Completed Objective", objectiveDefinition.toString());
+                    String completionTextValue = objectiveDefinition.getString("completionValue") + "/" +
+                                    objectiveDefinition.getString("completionValue");
+                    holder.completionText.setText(completionTextValue);
+                }
+
+                if (stepFuture) {
+                    String completionTextValue = "0/" +
+                            objectiveDefinition.getString("completionValue");
+                    holder.completionText.setText(completionTextValue);
                 }
 
                 //completed objectives do not have instance info associated with them.

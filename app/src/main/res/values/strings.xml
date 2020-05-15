@@ -63,8 +63,8 @@
     <string name="completed_record">\u0020(Completed)</string>
 
     <string name="no_tracked_pursuit">No pursuits being tracked</string>
-    <string name="pursuit_tracked">Tracked Pursuit</string>
-    <string name="pursuit_list">List</string>
+    <string name="pursuit_tracked">Tracked</string>
+    <string name="pursuit_list">Quests</string>
 
     <string name="picker_button_equip">Equip Item</string>
     <string name="picker_button_cancel">Cancel</string>
