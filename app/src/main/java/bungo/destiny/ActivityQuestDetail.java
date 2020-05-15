@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,12 +51,11 @@ public class ActivityQuestDetail extends AppCompatActivity {
         setContentView(R.layout.activity_quest_detail);
         context = this;
 
-
         View titleLayout = findViewById(R.id.layout_title);
         //View displaySourceLayout = findViewById(R.id.layout_source);
         View objectivesLayout = findViewById(R.id.layout_objectives);
         //View rewardsLayout = findViewById(R.id.layout_rewards);
-        View rewardsLayout = findViewById(R.id.rewards);
+        //View rewardsLayout = findViewById(R.id.rewards);
         //View descriptionLayout = findViewById(R.id.layout_description);
         //View descriptionLayout = findViewById(R.id.layout_description);
 
@@ -70,9 +70,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
             trackingValue = getTrackingValue(itemHash);
             stepPosition = getStepPosition(itemHash);
 
-            Log.d("item", inventoryItem.toString());
-            Log.d("item definition", itemDefinition.toString());
-
             setTitleData(titleLayout);
 
             setSteps(objectivesLayout);
@@ -80,7 +77,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
             setRewards(objectivesLayout);
 
         } catch (Exception e) {
-            Log.d("Quest Detail", e.toString());
+            Log.e("Quest Detail", Log.getStackTraceString(e));
         }
     }
 
@@ -120,7 +117,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
             background.setBackgroundColor(colorCode);
 
         } catch (Exception e) {
-            Log.d("Title Data", e.toString());
+            Log.e("Set Title", Log.getStackTraceString(e));
         }
     }
 
@@ -161,7 +158,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
 
             }
         } catch (Exception e) {
-            Log.d("Rewards", e.toString());
+            Log.d("Rewards", Log.getStackTraceString(e));
         }
     }
 
@@ -198,7 +195,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 new LoadImages(holder.rewardIconImageView).execute(icon);
 
             } catch (Exception e) {
-                Log.d("Reward", e.toString());
+                Log.d("Reward", Log.getStackTraceString(e));
             }
         }
 
@@ -238,7 +235,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 }
 
             } catch (Exception e) {
-                Log.d("Steps Adapter", e.toString());
+                Log.d("Steps Adapter", Log.getStackTraceString(e));
             }
         }
 
@@ -258,7 +255,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 String signedStepHash = ActivityMain.context.getSignedHash(stepHash);
 
                 JSONObject stepDefinition = new JSONObject(ActivityMain.context.defineElement(signedStepHash, "DestinyInventoryItemDefinition"));
-                Log.d(stepHash, stepDefinition.toString());
                 String stepText = stepDefinition.getJSONObject("displayProperties").getString("name");
                 String description = stepDefinition.getJSONObject("displayProperties").getString("description");
                 String displaySource = stepDefinition.getString("displaySource");
@@ -271,7 +267,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 }
 
                 if (stepDefinition.has("objectives")) {
-                    //JSONArray objectiveHashes = stepDefinition.getJSONObject("objectives").getJSONArray("objectiveHashes");
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ActivityQuestDetail.this, LinearLayoutManager.VERTICAL, false);
                     ObjectivesAdapter objectivesAdapter = new ObjectivesAdapter(ActivityQuestDetail.this, stepDefinition);
                     viewHolder.step_recycler.setAdapter(objectivesAdapter);
@@ -279,7 +274,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 }
 
             } catch (Exception e) {
-                Log.d("Step", e.toString());
+                Log.d("Step", Log.getStackTraceString(e));
             }
         }
 
@@ -316,7 +311,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
         ObjectivesAdapter(Context context, JSONObject stepDefinition) {
             this.layoutInflater = LayoutInflater.from(context);
             this.context = context;
-            //this.data = data;
             try {
                 this.data = stepDefinition.getJSONObject("objectives").getJSONArray("objectiveHashes");
                 if (getTrackingValue(stepDefinition.getString("hash")) < trackingValue) {
@@ -325,7 +319,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
                     stepFuture = true;
                 }
             } catch (Exception e) {
-                Log.d("Objectives Adapter", e.toString());
+                Log.d("Objectives Adapter", Log.getStackTraceString(e));
             }
         }
 
@@ -347,8 +341,11 @@ public class ActivityQuestDetail extends AppCompatActivity {
 
                 String signedHash = ActivityMain.context.getSignedHash(data.getString(position));
                 JSONObject objectiveDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyObjectiveDefinition"));
-                //Log.d("Objective Definition", objectiveDefinition.toString());
                 String progressDescription = objectiveDefinition.getString("progressDescription");
+                int progress = objectiveDefinition.getInt("completionValue");
+                int max = objectiveDefinition.getInt("completionValue");
+                int valueStyle = objectiveDefinition.getInt("completedValueStyle");
+
                 String regex = "\\[(.*?)\\]";
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(progressDescription);
@@ -374,11 +371,11 @@ public class ActivityQuestDetail extends AppCompatActivity {
                             holder.completeCheckBox.setChecked(unInstancedItemObjective.getJSONObject(i).getBoolean("complete"));
                             holder.completionProgress.setMax(unInstancedItemObjective.getJSONObject(i).getInt("completionValue"));
                             holder.completionProgress.setProgress(unInstancedItemObjective.getJSONObject(i).getInt("progress"));
-                            String completionTextValue =
-                                    unInstancedItemObjective.getJSONObject(i).getString("progress") + "/" +
-                                    objectiveDefinition.getString("completionValue");
-                            holder.completionText.setText(completionTextValue);
-                            Log.d("UnInstanced", unInstancedItemObjective.getJSONObject(i).toString());
+                            String completionValueText = completionText(
+                                    valueStyle,
+                                    unInstancedItemObjective.getJSONObject(i).getInt("progress"),
+                                    max);
+                            holder.completionText.setText(completionValueText);
                             break;
                         }
                     }
@@ -390,11 +387,11 @@ public class ActivityQuestDetail extends AppCompatActivity {
                             holder.completeCheckBox.setChecked(objectives.getJSONArray("objectives").getJSONObject(i).getBoolean("complete"));
                             holder.completionProgress.setMax(objectives.getJSONArray("objectives").getJSONObject(i).getInt("completionValue"));
                             holder.completionProgress.setProgress(objectives.getJSONArray("objectives").getJSONObject(i).getInt("progress"));
-                            String completionTextValue =
-                                    objectives.getJSONArray("objectives").getJSONObject(i).getString("progress") + "/" +
-                                    objectiveDefinition.getString("completionValue");
-                            holder.completionText.setText(completionTextValue);
-                            Log.d("Instanced", objectives.getJSONArray("objectives").getJSONObject(i).toString());
+                            String completionValueText = completionText(
+                                    valueStyle,
+                                    objectives.getJSONArray("objectives").getJSONObject(i).getInt("progress"),
+                                    max);
+                            holder.completionText.setText(completionValueText);
                             break;
                         }
                     }
@@ -404,22 +401,21 @@ public class ActivityQuestDetail extends AppCompatActivity {
                     holder.completeCheckBox.setChecked(true);
                     holder.completionProgress.setMax(1);
                     holder.completionProgress.setProgress(1);
-
-                    Log.d("Completed Objective", objectiveDefinition.toString());
-                    String completionTextValue = objectiveDefinition.getString("completionValue") + "/" +
-                                    objectiveDefinition.getString("completionValue");
-                    holder.completionText.setText(completionTextValue);
+                    String completionValueText = completionText(valueStyle, progress, max);
+                    holder.completionText.setText(completionValueText);
                 }
 
                 if (stepFuture) {
-                    String completionTextValue = "0/" +
-                            objectiveDefinition.getString("completionValue");
-                    holder.completionText.setText(completionTextValue);
+                    String completionValueText = completionText(
+                            valueStyle,
+                            0,
+                            max);
+                    holder.completionText.setText(completionValueText);
                 }
 
                 //completed objectives do not have instance info associated with them.
             } catch (Exception e) {
-                Log.d("Objectives Adapter", e.toString());
+                Log.d("Objectives Adapter", Log.getStackTraceString(e));
             }
         }
 
@@ -456,7 +452,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
             String iconUrl = params[0];
             Bitmap icon;
             try {
-                //Log.d("Icon Url", iconUrl);
                 String iconPath = iconUrl.substring(iconUrl.lastIndexOf("/") + 1);
                 Bitmap iconFromMemory = ActivityMain.context.getImage(iconPath);
 
@@ -505,7 +500,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 }
             }
         } catch (Exception e) {
-            Log.d("Step Position", e.toString());
+            Log.d("Step Position", Log.getStackTraceString(e));
         }
 
         return stepPosition;
@@ -524,11 +519,23 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 }
             }
         } catch (Exception e) {
-            Log.d("Tracking Value", e.toString());
+            Log.d("Tracking Value", Log.getStackTraceString(e));
         }
         return trackingValue;
     }
 
+    private String completionText (int type, int progress, int max) {
+        String text = "";
+        switch (type) {
+            case 3:
+                double decimal = (progress/max) *100;
+                text = String.format(Locale.getDefault(), "%.2f", decimal)  + "%";
+                break;
+            default:
+                text = progress + "/" + max;
+        }
+        return text;
+    }
     /* value style enum:
    0:automatic
    1:fraction

@@ -35,18 +35,18 @@ import java.net.UnknownHostException;
 
 public class FragmentQuestsSelect extends Fragment {
 
-    String characterId;
-    Handler handler;
-    int PURSUITS_COMPLETE = 1;
-    int MILESTONES_COMPLETE = 2;
+    private String characterId;
+    private Handler handler;
+    private int PURSUITS_COMPLETE = 1;
+    private int MILESTONES_COMPLETE = 2;
 
-    JSONArray pursuitsData;
+    private JSONArray pursuitsData;
 
-    ItemAdapter.ViewHolder viewHolder;
-    RecyclerView pursuitsRecycler;
-    ItemAdapter pursuitsAdapter;
+    private ItemAdapter.ViewHolder viewHolder;
+    private RecyclerView pursuitsRecycler;
+    private ItemAdapter pursuitsAdapter;
 
-    View view;
+    private View view;
 
     public FragmentQuestsSelect() {}
 
@@ -58,6 +58,7 @@ public class FragmentQuestsSelect extends Fragment {
             @Override
             public void handleMessage(Message inputMessage) {
                 super.handleMessage(inputMessage);
+                /*
                 switch (inputMessage.what) {
                     case 1:
                         pursuitsAdapter.notifyDataSetChanged();
@@ -68,15 +69,15 @@ public class FragmentQuestsSelect extends Fragment {
                         //todo add to pursuitsRecycler
                         break;
                 }
+                 */
+                pursuitsAdapter.notifyDataSetChanged();
             }
         };
     }
 
     @Override
     public View onCreateView (@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_pursuits_select, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_pursuits_select, container, false);
     }
 
     @Override
@@ -100,10 +101,12 @@ public class FragmentQuestsSelect extends Fragment {
             @Override
             public void run() {
                 try {
-
                     characterId = ActivityCharacter.context.characterId;
                     JSONObject characterInventories = ActivityMain.context.character.getCharacterInventories();
-                    JSONArray characterInventoryArray = characterInventories.getJSONObject("data").getJSONObject(characterId).getJSONArray("items");
+                    JSONArray characterInventoryArray = characterInventories
+                            .getJSONObject("data")
+                            .getJSONObject(characterId)
+                            .getJSONArray("items");
                     //Log.d("Pursuits Definition", ActivityMain.context.defineElement(getResources().getString(R.string.fixed_hash_pursuits), "DestinyInventoryBucketDefinition"));
                     //Log.d("Inventories", characterInventoryArray.toString());
                     //Log.d("ch inventory array", String.valueOf(characterInventoryArray.length()));
@@ -113,26 +116,34 @@ public class FragmentQuestsSelect extends Fragment {
                         JSONObject pursuitItem = new JSONObject();
                         if (bucketHash.equals(getResources().getString(R.string.fixed_hash_pursuits))) {
                             //Log.d("Pursuit", inventoryItem.toString());
-
                             //Log.d("Array Item", characterInventoryArray.getJSONObject(i).toString());
-
                             String itemHash = characterInventoryArray.getJSONObject(i).getString("itemHash");
                             String signedHash = ActivityMain.context.getSignedHash(itemHash);
                             JSONObject itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyInventoryItemDefinition"));
 
+                            int state = inventoryItem.getInt("state");
                             //itemType 12 = quest step
                             //itemType 26 = bounty
                             if (itemDefinition.getString("itemType").equals("26")) {
-                                Log.d("Item type", "Bounty");
-                                continue;
+                                Log.d("Bounty", itemHash);
+                                continue; //todo do bounty calculations
+                            }
+                            if (itemDefinition.getBoolean("redacted")) {
+                                Log.d("Classified", itemDefinition.toString());
+                                continue; //todo deal with classified items
                             }
 
-                            int state = inventoryItem.getInt("state");
+                            if (state == 2) { //tracked pursuit
+                                Log.d("Tracked", inventoryItem.toString());
+                                loadTrackedPursuit(pursuitItem); //todo add all tracked pursuits to an array and process to a recyclerView
+                                continue;
+                            } else if (state == 4) { //super special state... like the Chalice update 5/15/20 except its not special anymore
+                                Log.d("Special Shit", inventoryItem.toString());
+                            }
                             String quantity = inventoryItem.getString("quantity");
                             boolean isExotic = false;
-                            //tierType 5 is Legendary
-                            //tierType 6 is Exotic
                             if (itemDefinition.getJSONObject("inventory").getString("tierType").equals("6")) isExotic = true ;
+                            //see ActivityQuestDetail for tierType enumeration
                             pursuitItem.put("inventoryItem", inventoryItem);
                             pursuitItem.put("itemHash",itemHash);
                             if (itemDefinition.has("setData")) {
@@ -145,11 +156,7 @@ public class FragmentQuestsSelect extends Fragment {
                             pursuitItem.put("quantity" ,quantity);
                             pursuitItem.put("isExotic", isExotic);
 
-                            if (itemDefinition.getBoolean("redacted")) {
-                                Log.d("Classified", itemDefinition.toString());
-                                continue;
-                                //todo deal with classified items
-                            }
+
 
                             if (itemDefinition.getJSONObject("inventory").getBoolean("isInstanceItem")) {
                                 String itemInstanceId = inventoryItem.optString("itemInstanceId");
@@ -183,21 +190,7 @@ public class FragmentQuestsSelect extends Fragment {
                                         pursuitItem.put("complete", false);
                                     }
                                 }
-/*
-                                if (itemHash.equals("1472484362")) {
-                                    Log.d("Small Gift", inventoryItem.toString());
-                                    Log.d("Definition", itemDefinition.toString());
-                                    Log.d("Objectives", objectives.toString());
-                                }
 
- */
-                                if (state == 2) { //tracked pursuit
-                                    Log.d("Tracked", inventoryItem.toString());
-                                    loadTrackedPursuit(pursuitItem);
-                                    continue;
-                                } else if (state == 4) { //super special state... like the Chalice
-                                    Log.d("Special Shit", inventoryItem.toString());
-                                }
                             }
                             pursuitsData.put(pursuitItem);
                         }
