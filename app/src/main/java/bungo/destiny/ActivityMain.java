@@ -75,10 +75,10 @@ public class ActivityMain extends AppCompatActivity {
     int FAILURE = 1001;
 
     Data data = new Data();
-    Data.Profile profile = data.new Profile();
-    Data.Character character = data.new Character();
+    Data.Profile profile = new Data.Profile();
+    Data.Character character = new Data.Character();
     Data.Clan clan = data.new Clan();
-    Data.Account account = data.new Account();
+    Data.Account account = new Data.Account();
     Data.Records records = data.new Records();
     Data.PresentationNodes presentationNodes = data.new PresentationNodes();
     //Data.Vendors vendors = data.new Vendors();
@@ -95,6 +95,8 @@ public class ActivityMain extends AppCompatActivity {
         final FragmentTriumphsSelect fragmentTriumphsSelect = new FragmentTriumphsSelect();
         final FragmentCharacterSelect fragmentCharacterSelect = new FragmentCharacterSelect();
         //final FragmentClan fragmentClanSelect = new FragmentClan();
+        final FragmentRanks fragmentRanks = new FragmentRanks();
+        final FragmentInventorySelect fragmentInventorySelect = new FragmentInventorySelect();
         fragmentVaultSelect = new FragmentVault();
 
         viewPager = findViewById(R.id.main_viewPager);
@@ -105,6 +107,7 @@ public class ActivityMain extends AppCompatActivity {
         viewPagerAdapter.addFragment(fragmentTriumphsSelect);
         viewPagerAdapter.addFragment(fragmentCharacterSelect);
         //viewPagerAdapter.addFragment(fragmentClanSelect);
+        viewPagerAdapter.addFragment(fragmentRanks);
         viewPagerAdapter.addFragment(fragmentVaultSelect);
 
         viewPagerAdapter.notifyDataSetChanged();
@@ -136,27 +139,18 @@ public class ActivityMain extends AppCompatActivity {
                 switch (inputMessage.what) {
                     case 100:
                         Log.d("Profile", "Data Loaded");
-                        try {
-                            Log.d("Profile Progression", profile.getProfileProgression()
-                                    .getJSONObject("data")
-                                    .getJSONObject("seasonalArtifact")
-                                    .toString());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
                         fragmentVaultSelect.buildInventoryList();
                         break;
                     case 200:
                         Log.d("Character", "Data Loaded");
-                        //gloryHole();
                         fragmentCharacterSelect.buildCharacterFragment();
+                        fragmentRanks.getRankData();
                         break;
                     case 400:
                         Log.d("Records", "Data Loaded");
                         break;
                     case 700:
                         Log.d("Presentation Nodes", "Data Loaded");
-                        //fragmentTriumphsSelect.buildTriumphsAndSeals();
                         fragmentTriumphsSelect.getRecordsData();
                         break;
                     case 900:
@@ -265,11 +259,25 @@ public class ActivityMain extends AppCompatActivity {
                     @Override
                     public void run() {
                         JSONObject transitoryDataObject = destinyAPI.getTransitory();
-                        Log.d("T Data?", transitoryDataObject.toString());
-                        //vendors.setVendorData(vendorDataObject);
+                        Log.d("Transitory Data", transitoryDataObject.toString());
                     }
                 });
 
+                ActivityMain.threadPoolExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject metricsDataObject = destinyAPI.getMetrics();
+                        Log.d("Metrics Data", metricsDataObject.toString());
+                    }
+                });
+/* Forbidden :(
+                ActivityMain.threadPoolExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        JSONObject AWAData = destinyAPI.initiateAWA();
+                    }
+                });
+*/
             } catch (Exception e){
                 Log.d("Error", e.toString());
             }

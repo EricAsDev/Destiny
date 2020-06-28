@@ -7,6 +7,10 @@
     <string name="stats_url">https://stats.bungie.net/Platform/</string>
     <string name="request_auth_url">https://www.bungie.net/en/oauth/authorize?client_id=</string>
     <string name="request_token_url">https://www.bungie.net/platform/app/oauth/token/</string>
+    <string name="heavy_ammo_icon_url">/img/destiny_content/ammo_types/heavy.png</string>
+    <string name="special_ammo_icon_url">/img/destiny_content/ammo_types/special.png</string>
+    <string name="primary_ammo_icon_url">/img/destiny_content/ammo_types/primary.png</string>
+
     <string name="login">Logging in</string>
     <string name="get_manifest">Verifying Resources</string>
     <string name="get_database">Updating Content</string>
@@ -24,6 +28,7 @@
     <string name="menu_triumphs">Triumphs &amp; Seals</string>
     <string name="menu_gear">Gear</string>
     <string name="menu_loadouts">Loadouts</string>
+    <string name="menu_postmaster">Postmaster</string>
 
     <string name="character_power">Power</string>
     <string name="character_power_value">100</string>
@@ -44,10 +49,15 @@
 
     <string name="pursuits_fragment">Pursuits</string>
 
+    <string name="fixed_trait_category_hash">-52912308</string>
     <string name="fixed_hash_pursuits">1345459588</string>
     <string name="fixed_hash_seals">1652422747</string>
     <string name="fixed_hash_triumphs">1024788583</string>
     <string name="fixed_hash_vault_vendor">1037843411</string>
+    <!--
+    <string name="fixed_hash_postmaster_bucket">3161908920</string>
+    -->
+    <string name="fixed_hash_postmaster_vendor">-1133058376</string>
     <string name="fixed_hash_vault_bucket">138197802</string>
     <string name="fixed_category_armor">1</string>
     <string name="fixed_hash_postmaster">215593132</string> <!-- Lost Items -->
@@ -59,12 +69,14 @@
     <string name="fixed_hash_valor">3882308435</string>
     <string name="fixed_hash_gambit">2772425241</string>
     <string name="fixed_tierTypeHash_exotic">2759499571</string>
+    <string name="fixed_hash_engrams">375726501</string>
 
     <string name="completed_record">\u0020(Completed)</string>
 
     <string name="no_tracked_pursuit">No pursuits being tracked</string>
-    <string name="pursuit_tracked">Tracked</string>
+    <string name="pursuit_tracked">Tracked Quests</string>
     <string name="pursuit_list">Quests</string>
+    <string name="all_pursuits">View All Pursuits</string>
 
     <string name="picker_button_equip">Equip Item</string>
     <string name="picker_button_cancel">Cancel</string>
@@ -78,5 +90,9 @@
     <string name="crucible_bravo">Bravo</string>
 
     <string name="rewards_title">REWARDS:</string>
+    
+    <string name="inventory_filtering.bounty">Bounties</string>
+    <string name="inventory_filtering.quest">Quests</string>
+    <string name="inventory_filtering.quest.featured">Featured</string>
 
 </resources>

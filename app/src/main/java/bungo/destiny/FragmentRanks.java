@@ -36,8 +36,8 @@ public class FragmentRanks extends Fragment {
 
     private String gloryStreakHash = ActivityMain.context.getResources().getString(R.string.fixed_hash_glory_streak);
     private String valorStreakHash = ActivityMain.context.getResources().getString(R.string.fixed_hash_valor_streak);
-    private String gloryHash = ActivityMain.context.getResources().getString(R.string.fixed_hash_glory);
-    private String valorHash = ActivityMain.context.getResources().getString(R.string.fixed_hash_valor);
+    //private String gloryHash = ActivityMain.context.getResources().getString(R.string.fixed_hash_glory);
+    //private String valorHash = ActivityMain.context.getResources().getString(R.string.fixed_hash_valor);
     private String gambitHash = ActivityMain.context.getResources().getString(R.string.fixed_hash_gambit);
     private String gloryHashDetailed = ActivityMain.context.getResources().getString(R.string.fixed_hash_glory_detailed);
     private String valorHashDetailed = ActivityMain.context.getResources().getString(R.string.fixed_hash_valor_detailed);
@@ -103,7 +103,7 @@ public class FragmentRanks extends Fragment {
     @Override
     public void onViewCreated (@NonNull View view, Bundle bundle) {
         super.onViewCreated(view, bundle);
-        getRankData();
+        //getRankData();
     }
 
     private void updateRankData () {
@@ -124,7 +124,7 @@ public class FragmentRanks extends Fragment {
         });
     }
 
-    private void getRankData () {
+    public void getRankData () {
         ActivityMain.threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -135,17 +135,19 @@ public class FragmentRanks extends Fragment {
                 JSONObject gambitProgression;
 
                 try {
-                    String characterId = ActivityCharacter.context.characterId;
+                    //String characterId = ActivityCharacter.context.characterId;
+                    String characterId = character.getCharacters().getJSONObject("data").names().getString(0);
                     JSONObject getCharacterProgression = character.getCharacterProgressions();
 
                     JSONObject characterProgression = getCharacterProgression.getJSONObject("data").getJSONObject(characterId);
                     JSONObject progressions = characterProgression.getJSONObject("progressions");
+                    /*
                     for (int i = 0; i < progressions.length(); i++) {
                         Log.d("Progress", progressions.getJSONObject(progressions.names().getString(i)).toString());
                     }
-
+                    */
                     gloryProgression = progressions.getJSONObject(gloryHashDetailed);
-                    Log.d("Glory", gloryProgression.toString());
+                    //Log.d("Glory", gloryProgression.toString());
                     valorProgression = progressions.getJSONObject(valorHashDetailed);
                     gambitProgression = progressions.getJSONObject(gambitHash);
 
@@ -239,11 +241,11 @@ public class FragmentRanks extends Fragment {
                     jsonObject.put("mode", "63");
 
                     displayList.put(jsonObject);
-
+/*
                     Log.d("Glory " + gloryStreak, gloryProgression.toString());
                     Log.d("Valor " + valorStreak, valorDefinition.toString());
                     Log.d("Gambit", gambitDefinition.toString());
-
+*/
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -378,7 +380,7 @@ public class FragmentRanks extends Fragment {
                 }
 
             } catch (Exception e) {
-                Log.d("LoadInventoryImages", e.getMessage());
+                Log.d("LoadInventoryImages", Log.getStackTraceString(e));
                 e.printStackTrace();
             }
             return null;

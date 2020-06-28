@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Handler;
+//import android.os.Handler;
 import android.util.Log;
 import android.view.Window;
 
@@ -24,9 +24,8 @@ public class ActivityCharacter extends AppCompatActivity {
 
     String characterId;
     public JSONArray aggregateEquipment;
-    Handler handler;
+    //Handler handler;
 
-    FragmentRanks fragmentRanks = new FragmentRanks();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +46,9 @@ public class ActivityCharacter extends AppCompatActivity {
 
         viewPagerAdapter.addFragment(new FragmentLoadouts());
         viewPagerAdapter.addFragment(new FragmentGearSelect());
-        viewPagerAdapter.addFragment(new FragmentQuestsSelect());
-        viewPagerAdapter.addFragment(fragmentRanks);
-        //viewPagerAdapter.addFragment(new FragmentInventorySelect()); //fragment causes crash leaving character and re-entering
+        viewPagerAdapter.addFragment(new FragmentPursuits());
+        viewPagerAdapter.addFragment(new FragmentPostmaster());
+        viewPagerAdapter.addFragment(new FragmentInventorySelect()); //fragment causes crash leaving character and re-entering
         viewPagerAdapter.notifyDataSetChanged();
 
         viewPager.setCurrentItem(1);

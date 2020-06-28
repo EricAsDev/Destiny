@@ -67,6 +67,8 @@
         <activity
             android:name=".ActivityRecordItem"
             android:screenOrientation="portrait" />
+        <activity android:name=".ActivityAllPursuits"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

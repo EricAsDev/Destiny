@@ -21,7 +21,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,7 +37,6 @@ public class ActivityQuestDetail extends AppCompatActivity {
 
     JSONObject inventoryItem;
     public JSONObject itemDefinition;
-    public JSONObject itemInstanceData;
     public String characterId;
     public Context context;
 
@@ -52,12 +50,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
         context = this;
 
         View titleLayout = findViewById(R.id.layout_title);
-        //View displaySourceLayout = findViewById(R.id.layout_source);
         View objectivesLayout = findViewById(R.id.layout_objectives);
-        //View rewardsLayout = findViewById(R.id.layout_rewards);
-        //View rewardsLayout = findViewById(R.id.rewards);
-        //View descriptionLayout = findViewById(R.id.layout_description);
-        //View descriptionLayout = findViewById(R.id.layout_description);
 
         Intent receivedIntent = getIntent();
 
@@ -69,6 +62,9 @@ public class ActivityQuestDetail extends AppCompatActivity {
             itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyInventoryItemDefinition"));
             trackingValue = getTrackingValue(itemHash);
             stepPosition = getStepPosition(itemHash);
+
+            Log.d("Item", inventoryItem.toString());
+            Log.d("Definition", itemDefinition.toString());
 
             setTitleData(titleLayout);
 
@@ -138,10 +134,10 @@ public class ActivityQuestDetail extends AppCompatActivity {
     private void setRewards (View view) {
         //rewards are for bounties only. where are the rewards for QUESTS?
         //rewards are found in the item definition, "value" object. See DestinyItemValueBlockDefinition
-        View rewardsView = view.findViewById(R.id.layout_rewards);
-        RecyclerView reward_recycler = rewardsView.findViewById(R.id.recycler_rewards);
         try {
             if (itemDefinition.has("value")) {
+                View rewardsView = view.findViewById(R.id.layout_rewards);
+                RecyclerView reward_recycler = rewardsView.findViewById(R.id.recycler_rewards);
                 rewardsView.setVisibility(View.VISIBLE);
                 JSONArray itemValue = itemDefinition.getJSONObject("value").getJSONArray("itemValue");
                 JSONArray rewards = new JSONArray();
@@ -184,7 +180,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
             viewHolder = holder;
             try {
                 String itemHash = data.getJSONObject(position).getString("itemHash");
-                String quantity = data.getJSONObject(position).getString("quantity");
+                //String quantity = data.getJSONObject(position).getString("quantity");
 
                 String signedHash = ActivityMain.context.getSignedHash(itemHash);
                 JSONObject itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyInventoryItemDefinition"));
@@ -230,8 +226,9 @@ public class ActivityQuestDetail extends AppCompatActivity {
 
                 } else {
                     //no step data so, only one thing to do. put the itemHash here instead
-                    JSONObject stepData = new JSONObject().put("itemHash", inventoryItem.getJSONObject("inventoryItem").getString("itemHash"));
+                    JSONObject stepData = new JSONObject().put("itemHash", inventoryItem.getString("itemHash"));
                     this.data = new JSONArray().put(stepData);
+                    //Log.d("Item", data.toString());
                 }
 
             } catch (Exception e) {
@@ -339,14 +336,15 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 holder.completeCheckBox.setChecked(false);
                 holder.completionText.setText("");
 
-                String signedHash = ActivityMain.context.getSignedHash(data.getString(position));
+                String objectiveHash = data.getString(position);
+                String signedHash = ActivityMain.context.getSignedHash(objectiveHash);
                 JSONObject objectiveDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyObjectiveDefinition"));
                 String progressDescription = objectiveDefinition.getString("progressDescription");
                 int progress = objectiveDefinition.getInt("completionValue");
                 int max = objectiveDefinition.getInt("completionValue");
                 int valueStyle = objectiveDefinition.getInt("completedValueStyle");
 
-                String regex = "\\[(.*?)\\]";
+                String regex = "\\[(.*?)]";
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(progressDescription);
                 if (matcher.find()) {
@@ -366,8 +364,9 @@ public class ActivityQuestDetail extends AppCompatActivity {
                             .getJSONObject(characterId)
                             .getJSONObject("uninstancedItemObjectives")
                             .getJSONArray(inventoryItem.getString("itemHash"));
+
                     for (int i = 0; i < unInstancedItemObjective.length(); i++) {
-                        if (unInstancedItemObjective.getJSONObject(i).getString("objectiveHash").equals(signedHash)) {
+                        if (unInstancedItemObjective.getJSONObject(i).getString("objectiveHash").equals(objectiveHash)) {
                             holder.completeCheckBox.setChecked(unInstancedItemObjective.getJSONObject(i).getBoolean("complete"));
                             holder.completionProgress.setMax(unInstancedItemObjective.getJSONObject(i).getInt("completionValue"));
                             holder.completionProgress.setProgress(unInstancedItemObjective.getJSONObject(i).getInt("progress"));
@@ -380,7 +379,8 @@ public class ActivityQuestDetail extends AppCompatActivity {
                         }
                     }
                 } else {
-                    String itemInstanceId = inventoryItem.getJSONObject("inventoryItem").getString("itemInstanceId");
+                    //String itemInstanceId = inventoryItem.getJSONObject("inventoryItem").getString("itemInstanceId");
+                    String itemInstanceId = inventoryItem.getString("itemInstanceId");
                     JSONObject objectives = ActivityMain.context.character.getItemObjectives().optJSONObject(itemInstanceId);
                     for (int i = 0; i < objectives.getJSONArray("objectives").length(); i++) {
                         if (objectives.getJSONArray("objectives").getJSONObject(i).getString("objectiveHash").equals(data.getString(position))) {
@@ -525,17 +525,16 @@ public class ActivityQuestDetail extends AppCompatActivity {
     }
 
     private String completionText (int type, int progress, int max) {
-        String text = "";
-        switch (type) {
-            case 3:
-                double decimal = (progress/max) *100;
-                text = String.format(Locale.getDefault(), "%.2f", decimal)  + "%";
-                break;
-            default:
-                text = progress + "/" + max;
+        String text;
+        if (type == 3) {
+            double decimal = (double) progress / (double) max * 100;
+            text = String.format(Locale.getDefault(), "%.2f", decimal) + "%";
+        } else {
+            text = progress + "/" + max;
         }
         return text;
     }
+
     /* value style enum:
    0:automatic
    1:fraction

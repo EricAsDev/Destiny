@@ -23,7 +23,9 @@
             android:fontFamily="@font/destiny_symbols_pc"
             tools:text="TextView"
             android:textColor="@android:color/white"
-            android:textSize="30sp"
+            android:textSize="24sp"
+            android:maxLines="1"
+            android:ellipsize="end"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

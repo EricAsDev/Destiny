@@ -25,6 +25,31 @@ class DestinyAPI {
     //update vault inventory - Profile 102
     //update character information 200
 
+    JSONObject initiateAWA () {
+        try {
+
+            JSONObject postParams = new JSONObject();
+            postParams.put("type", 1);
+            postParams.put("characterId", "2305843009267660573");
+            postParams.put("membershipType", membershipType);
+            postParams.put("affectedItemId", "6917529150524277605");
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("method", "POST");
+            jsonObject.put("url", requestUrl + "Destiny2/Awa/Initialize/");
+            jsonObject.put("x_api_key", xApiKey);
+            jsonObject.put("access_token", accessToken);
+            jsonObject.put("post_params", postParams);
+
+            HttpCall httpCall = new HttpCall();
+            return httpCall.httpExecute(jsonObject);
+
+        } catch (Exception e) {
+            Log.d("Vault Transfer", e.toString());
+        }
+        return null;
+
+    }
 
     JSONObject getActivities (String... params) {
         // /Destiny2/{membershipType}/Account/{destinyMembershipId}/Character/{characterId}/Stats/Activities/
@@ -88,6 +113,28 @@ class DestinyAPI {
         return null;
     }
 
+    JSONObject getMetrics () {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("method", "GET");
+            jsonObject.put("url", requestUrl
+                    + "Destiny2/"
+                    + membershipType
+                    + "/profile/"
+                    + membershipId
+                    + "/?components=1100");
+            jsonObject.put("x_api_key", xApiKey);
+            jsonObject.put("access_token", accessToken);
+
+            HttpCall httpCall = new HttpCall();
+            return httpCall.httpExecute(jsonObject);
+
+        } catch (Exception e){
+            Log.d("getMetrics Error", e.toString());
+        }
+        return null;
+    }
+
     JSONObject getTransitory () {
 
         try {
@@ -106,7 +153,7 @@ class DestinyAPI {
             return httpCall.httpExecute(jsonObject);
 
         } catch (Exception e){
-            Log.d("getCharacterData Error", e.toString());
+            Log.d("getTransitory Error", e.toString());
         }
         return null;
     }

@@ -11,4 +11,6 @@
     <color name="basic">#c3bcb4</color>
     <color name="no_tier">#ffffff</color>
 
+    <color name="tracked">#c0fd7f</color>
+
 </resources>

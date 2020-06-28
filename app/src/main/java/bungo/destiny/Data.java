@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 class Data {
 
-    class Account {
+    static class Account {
         private JSONObject accountData = new JSONObject();
 
         void setAccountData (JSONObject accountDataObject) {
@@ -22,7 +22,7 @@ class Data {
     }
 
     //100 Level
-    class Profile {
+    static class Profile {
         private JSONObject profile = new JSONObject();
         private JSONObject profileCurrencies = new JSONObject();
         private JSONObject profileInventory = new JSONObject();
@@ -58,7 +58,7 @@ class Data {
     }
 
     //200 Level
-    class Character {
+    static class Character {
         private JSONObject characters;
         private JSONObject characterInventories;
         private JSONObject characterProgressions;
