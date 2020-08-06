@@ -11,7 +11,7 @@
         android:id="@+id/gear_tint"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/customborder" />
+        android:background="@drawable/custom_border" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/include_layout"

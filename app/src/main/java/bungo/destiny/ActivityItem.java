@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,11 +30,13 @@ import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -52,32 +56,71 @@ public class ActivityItem extends AppCompatActivity {
     int PERKS_COMPLETE = 101;
     int INSTANCES_COMPLETE = 102;
 
-    JSONArray statsDisplay;
-    private List<StatsObject> statsObjectList;
-
     String itemHash;
-    String itemInstanceId;
 
-    Bitmap icon_primary;
-    Bitmap icon_special;
-    Bitmap icon_heavy;
+    JSONArray statsDisplay;
+    JSONObject instanceData;
+
+    private List<StatsObject> statsObjectList;
+    private List<String> itemCategoryList = new ArrayList<>(Arrays.asList(
+            "1", "18", "19", "20", "34", "35", "39", "40",
+            "41", "42", "43", "51", "55", "56", "57", "59"));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_inspect);
 
-        icon_primary = BitmapFactory.decodeResource(getResources(), R.drawable.icon_ammo_primary);
-        icon_special = BitmapFactory.decodeResource(getResources(), R.drawable.icon_ammo_special);
-        icon_heavy = BitmapFactory.decodeResource(getResources(), R.drawable.icon_ammo_heavy);
-
+        itemHash = "";
         Intent receivedIntent = getIntent();
-        String instanceString = receivedIntent.getStringExtra("instanceString");
-        Log.d("Selected Item", instanceString);
+        if (receivedIntent.hasExtra("itemHash")) {
+            itemHash = receivedIntent.getStringExtra("itemHash");
+        } else {
+            try {
+                JSONObject instanceString = new JSONObject(receivedIntent.getStringExtra("instanceString"));
+                getInstanceData(instanceString.getString("itemInstanceId"));
+                itemHash = instanceString.getString("itemHash");
+            } catch (Exception e) {
+                Log.d("Instance String", Log.getStackTraceString(e));
+            }
+        }
 
-        statsDisplay = new JSONArray();
-        String state;
+        try {
+            String signedHash = ActivityMain.context.getSignedHash(itemHash);
+            JSONObject itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyInventoryItemDefinition"));
+            JSONArray itemCategoryHashes = itemDefinition.getJSONArray("itemCategoryHashes");
+            List<String> itemCategories = new ArrayList<>();
+            for (int i = 0; i < itemCategoryHashes.length(); i++) {
+                itemCategories.add(itemCategoryHashes.getString(i));
+            }
+            itemCategoryList.retainAll(itemCategories);
+            Log.d("Category", itemCategoryList.toString());
 
+            LoadTitle(itemDefinition);
+
+            if (itemCategoryList.get(0).equals("1")) {
+                findViewById(R.id.armor_weapon).setVisibility(View.VISIBLE);
+                findViewById(R.id.layout_weapon).setVisibility(View.VISIBLE);
+                //LoadBasicStats(itemDefinition);//this should be capable of instance data
+                //load stats
+                //load perks
+            } else if (itemCategoryList.get(0).equals("20")) {
+                findViewById(R.id.armor_weapon).setVisibility(View.VISIBLE);
+                findViewById(R.id.layout_armor).setVisibility(View.VISIBLE);
+                //LoadBasicStats(itemDefinition);//this should be capable of instance data
+                //load stats
+                //load perks
+            }
+
+        } catch (Exception e) {
+            Log.d("Define Item", e.toString());
+        }
+
+
+        //statsDisplay = new JSONArray();
+        //String state;
+
+        /*
         final RecyclerView statsRecycler = findViewById(R.id.stats);
         RecyclerView perksRecycler = findViewById(R.id.perks);
         ImageView icon = findViewById(R.id.icon);
@@ -91,6 +134,8 @@ public class ActivityItem extends AppCompatActivity {
         statsLayoutManager = new LinearLayoutManager(this.getApplicationContext());
         statsRecycler.setLayoutManager(statsLayoutManager);
 
+         */
+/*
         try {
             JSONObject inventoryItem = new JSONObject(instanceString);
 
@@ -145,12 +190,14 @@ public class ActivityItem extends AppCompatActivity {
         } catch (Exception e) {
             Log.d("Item - definition", e.toString());
         }
-
+*/
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message inputMessage) {
                 super.handleMessage(inputMessage);
                 switch (inputMessage.what) {
+                    case 1:
+                        break;
                     case 100:
                         statsObjectList = new Gson().fromJson(statsDisplay.toString(), new TypeToken<List<StatsObject>>() {}.getType());
 
@@ -168,7 +215,7 @@ public class ActivityItem extends AppCompatActivity {
                         });
 
                         statsAdapter = new StatsAdapter(getApplicationContext(), statsObjectList);
-                        statsRecycler.setAdapter(statsAdapter);
+                        //statsRecycler.setAdapter(statsAdapter);
                         statsAdapter.notifyDataSetChanged();
                         break;
                     case 101:
@@ -179,6 +226,70 @@ public class ActivityItem extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private void LoadWeaponStats () {
+
+    }
+
+    private void LoadTitle (JSONObject itemDefinition) {
+
+        try {
+            View view = findViewById(R.id.include_layout);
+            ImageView iconImage = view.findViewById(R.id.inventory_item_image);
+            TextView nameText= findViewById(R.id.text_title);
+            TextView typeText = findViewById(R.id.type);
+            TextView descriptionText = findViewById(R.id.description);
+            View background = findViewById(R.id.layout_title);
+
+            String name = itemDefinition.getJSONObject("displayProperties").getString("name");
+            String icon = itemDefinition.getJSONObject("displayProperties").getString("icon");
+            String type = itemDefinition.getString("itemTypeDisplayName");
+            int tierType = itemDefinition.getJSONObject("inventory").getInt("tierType");
+            String description = itemDefinition.getJSONObject("displayProperties").getString("description");
+
+            //determine masterwork
+
+            nameText.setText(name);
+            typeText.setText(type);
+            descriptionText.setText(description);
+
+            int colorCode;
+
+            switch (tierType) {
+                case 6:
+                    colorCode = ActivityMain.context.getResources().getColor(R.color.exotic, null);
+                    break;
+                case 5:
+                    colorCode = ActivityMain.context.getResources().getColor(R.color.legendary, null);
+                    break;
+                case 4:
+                    colorCode = ActivityMain.context.getResources().getColor(R.color.rare, null);
+                    break;
+                case 3:
+                    colorCode = ActivityMain.context.getResources().getColor(R.color.common, null);
+                    break;
+                case 2:
+                    colorCode = ActivityMain.context.getResources().getColor(R.color.basic, null);
+                    break;
+                default:
+                    colorCode = ActivityMain.context.getResources().getColor(R.color.no_tier, null);
+                    break;
+            }
+            background.setBackgroundColor(colorCode);
+            new LoadInventoryImages(iconImage).execute(icon);
+
+        } catch (Exception e) {
+            Log.d("Title Data", Log.getStackTraceString(e));
+        }
+    }
+
+    private void LoadBasicWeaponData () {
+
+    }
+
+    private void LoadInstancedWeaponData () {
+
     }
 
     void getItemInformation (final String itemHash) {
@@ -209,15 +320,18 @@ public class ActivityItem extends AppCompatActivity {
                     }
 
                     JSONObject weaponStats = itemDefinition.getJSONObject("stats").getJSONObject("stats");
+
                     for (int i = 0; i < weaponStats.length(); i++) {
                         statHash = weaponStats.names().getString(i);
                         String signedStatHash = ActivityMain.context.getSignedHash(statHash);
 
+
                         JSONObject statDefinition = new JSONObject(ActivityMain.context.defineElement(signedStatHash, "DestinyStatDefinition"));
+                        //Log.d(signedStatHash, statDefinition.toString());
                         JSONObject displayProperties = statDefinition.getJSONObject("displayProperties");
                         Log.d("Stat", displayProperties.getString("name"));
                         JSONObject statObject = weaponStats.getJSONObject(statHash);
-
+/*
                         int statCategory = statDefinition.getInt("statCategory");
                         if (statCategory == 3) {
                             continue;
@@ -258,26 +372,30 @@ public class ActivityItem extends AppCompatActivity {
                         statsObject.put("isHidden", isHidden);
 
                         statsDisplay.put(statsObject);
-                    }
 
+ */
+                    }
+/*
                     Message message = new Message();
                     message.what = STATS_COMPLETE;
                     handler.sendMessage(message);
-
+*/
                 } catch (Exception e) {
-                    Log.d("Item Information", e.toString());
+                    Log.d("Item Information", Log.getStackTraceString(e));
                 }
             }
         });
     }
 
-    void getInstanceData (final String itemInstanceId) {
+    void getInstanceData (final String itemHash) {
         ActivityMain.threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    JSONObject response = new DestinyAPI().getItemInstance(itemInstanceId);
+                    JSONObject response = new DestinyAPI().getItemInstance(itemHash);
                     if (response.getInt("ErrorCode") == 1 ) {
+                        instanceData = response.getJSONObject("Response");
+
                         Log.d("Activity Response", response.getJSONObject("Response").names().toString());
                         //perks = response.getJSONObject("Response").getJSONObject("perks").getJSONObject("data").getJSONArray("perks");
                         Log.d("Perks Object", response.getJSONObject("Response").getJSONObject("perks").toString());
@@ -285,9 +403,14 @@ public class ActivityItem extends AppCompatActivity {
                         Log.d("Sockets Object", response.getJSONObject("Response").getJSONObject("sockets").toString());
                         stats = response.getJSONObject("Response").getJSONObject("stats").getJSONObject("data").getJSONObject("stats");
 
-                        //Log.d("perks", perks.toString());
-                        //Log.d("sockets", sockets.toString());
-                        Log.d("stats", stats.toString());
+                        //Log.d("stats", stats.names().toString());
+                        for (int i = 0; i < stats.names().length(); i++) {
+                            String signedStat = ActivityMain.context.getSignedHash(stats.names().getString(i));
+                            JSONObject statDefinition = new JSONObject(ActivityMain.context.defineElement(signedStat, "DestinyStatDefinition"));
+                            JSONObject displayProperties = statDefinition.getJSONObject("displayProperties");
+                            Log.d("instance Stat", displayProperties.getString("name"));
+                            //Log.d(signedStat, statDefinition.toString());
+                        }
 
                         //Perks commonly found in the hover over an item
                         /*
@@ -322,7 +445,7 @@ public class ActivityItem extends AppCompatActivity {
             }});
     }
 
-    class StatsObject {
+    static class StatsObject {
 
         boolean displayAsNumeric;
         boolean isHidden;
@@ -364,7 +487,7 @@ public class ActivityItem extends AppCompatActivity {
         private boolean getIsHidden () { return isHidden; }
     }
 
-    class StatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    static class StatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private LayoutInflater layoutInflater;
         private List<StatsObject> data;
 
@@ -373,7 +496,7 @@ public class ActivityItem extends AppCompatActivity {
             this.data = data;
         }
 
-        class ViewHolderBar extends RecyclerView.ViewHolder {
+        static class ViewHolderBar extends RecyclerView.ViewHolder {
             TextView nameView;
             ProgressBar valueView;
             private ViewHolderBar (View itemView) {
@@ -383,7 +506,7 @@ public class ActivityItem extends AppCompatActivity {
             };
 
         }
-        class ViewHolderNumber extends  RecyclerView.ViewHolder {
+        static class ViewHolderNumber extends  RecyclerView.ViewHolder {
             TextView nameView;
             TextView valueView;
             private ViewHolderNumber (View itemView) {
@@ -460,7 +583,7 @@ public class ActivityItem extends AppCompatActivity {
             return data.size();
         }
     }
-
+/*
     private Bitmap getAmmoIcon (int ammoType) {
         switch (ammoType){
             case 1:
@@ -472,7 +595,7 @@ public class ActivityItem extends AppCompatActivity {
         }
         return null;
     }
-
+*/
     static class LoadInventoryImages extends AsyncTask<String, Void, Bitmap> {
 
         private WeakReference<ImageView> imageViewWeakReference;
@@ -516,4 +639,5 @@ public class ActivityItem extends AppCompatActivity {
             }
         }
     }
+
 }

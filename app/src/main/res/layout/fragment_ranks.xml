@@ -25,7 +25,7 @@
             android:text="@string/menu_crucible"
             android:textAlignment="textEnd"
             android:textAllCaps="true"
-            android:textSize="20sp"
+            android:textSize="36sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 

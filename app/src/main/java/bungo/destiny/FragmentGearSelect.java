@@ -527,6 +527,25 @@ public class FragmentGearSelect extends Fragment {
                 powerTextView = view.findViewById(R.id.item_power);
                 typeTextView = view.findViewById(R.id.type);
 
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            String itemInstanceId = weaponsRecyclerData.getJSONObject(getAdapterPosition()).getString("itemInstanceId");
+                            for ( int i = 0; i < equippedItems.length() ; i++ ) {
+                                if (equippedItems.getJSONObject(i).getString("itemInstanceId").equals(itemInstanceId)) {
+                                    String instanceString = String.valueOf(equippedItems.getJSONObject(i));
+                                    Intent intent = new Intent(ActivityCharacter.context, ActivityItem.class);
+                                    intent.putExtra("instanceString", instanceString);
+                                    ActivityCharacter.context.startActivity(intent);
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.d("Long Click Item", e.toString());
+                        }
+                    }
+                });
+                /*
                 view.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -546,6 +565,8 @@ public class FragmentGearSelect extends Fragment {
                         return true;
                     }
                 });
+
+                 */
             }
         }
 
@@ -600,6 +621,7 @@ public class FragmentGearSelect extends Fragment {
                     viewHolder.elementImageView.setImageBitmap(null);
                 }
                 if (item.has("ammoType") && ammoType != 0) {
+                    //todo update to live image
                     viewHolder.ammoIcon.setImageBitmap(getAmmoIcon(ammoType));
                 } else {
                     viewHolder.ammoIcon.setImageBitmap(null);

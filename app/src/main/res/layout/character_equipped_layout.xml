@@ -12,22 +12,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/customborder" />
+        android:background="@drawable/custom_border" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/include_layout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_margin="4dp"
+        android:layout_margin="7dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="H,1:1">
 
-        <include layout="@layout/inventory_item_layout"/>
+        <include layout="@layout/thumbnail_layout"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

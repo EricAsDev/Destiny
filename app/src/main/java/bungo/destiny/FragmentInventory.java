@@ -1,8 +1,14 @@
 package bungo.destiny;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,13 +22,18 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,8 +42,9 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
-public class FragmentInventorySelect extends Fragment {
+public class FragmentInventory extends Fragment {
 
     Data.Profile profile = ActivityMain.context.profile;
     JSONObject sortedIntoBuckets;
@@ -42,15 +54,18 @@ public class FragmentInventorySelect extends Fragment {
     InventoryPagerAdapter inventoryPagerAdapter;
     InventoryAdapter.ViewHolder viewHolder;
     RecyclerView.LayoutManager layoutManager;
+    RecyclerView.LayoutManager pageSelectLayout;
+    PageSelectAdapter pageSelectAdapter;
+    ArrayList<Drawable> tabIcons;
 
-    ViewPager inventoryViewPager;
+    public static ViewPager inventoryViewPager;
     //TabLayout inventoryTabs;
 
     Handler handler;
     final int UPDATE_INVENTORY_ADAPTER = 100;
     final int UPDATE_ENGRAM_ADAPTER = 101;
 
-    public FragmentInventorySelect() {}
+    public FragmentInventory() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,7 +90,7 @@ public class FragmentInventorySelect extends Fragment {
 
     @Override
     public View onCreateView (@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_inventory_select, container, false);
+        return inflater.inflate(R.layout.fragment_inventory, container, false);
     }
 
     @Override
@@ -83,9 +98,28 @@ public class FragmentInventorySelect extends Fragment {
         super.onViewCreated(view, bundle);
 
         RecyclerView engramsRecycler = view.findViewById(R.id.inventory_engrams);
+        RecyclerView pageSelect =  view.findViewById(R.id.page_select);
 
         sortedIntoBuckets = new JSONObject();
         engrams = new JSONArray();
+
+        Drawable consumablesIcon = ActivityMain.context.getResources().getDrawable(R.drawable.icon_consumables, null);
+        Drawable modificationsIcon = ActivityMain.context.getResources().getDrawable(R.drawable.icon_modifications, null);
+        Drawable shadersIcon = ActivityMain.context.getResources().getDrawable(R.drawable.icon_shaders, null);
+
+        tabIcons = new ArrayList<>();
+        tabIcons.add(consumablesIcon);
+        tabIcons.add(modificationsIcon);
+        tabIcons.add(shadersIcon);
+
+        pageSelectAdapter = new PageSelectAdapter(ActivityCharacter.context, tabIcons);
+        pageSelectLayout = new LinearLayoutManager(ActivityCharacter.context, LinearLayoutManager.VERTICAL, false);
+        pageSelect.setLayoutManager(pageSelectLayout);
+        int spanCount = 1;
+        int spacing = 20; //todo calculate spacing view width minus 3 x 22% screen width cubes divided by 2
+        boolean includeEdge = false;
+        pageSelect.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
+        pageSelect.setAdapter(pageSelectAdapter);
 
         inventoryViewPager = view.findViewById(R.id.select_inventory_viewpager);
         inventoryPagerAdapter = new InventoryPagerAdapter(ActivityCharacter.context, sortedIntoBuckets);
@@ -97,20 +131,25 @@ public class FragmentInventorySelect extends Fragment {
         engramsRecycler.setLayoutManager(layoutManager);
         engramsRecycler.setAdapter(engramsAdapter);
 
+        pageSelectAdapter.notifyDataSetChanged();
+
+        //inventoryTabs = view.findViewById(R.id.select_inventory_tabs);
+        //inventoryTabs.setupWithViewPager(inventoryViewPager);
+
+
+
         buildInventory();
         buildEngrams();
+
+
+
 /*
-        Drawable consumablesIcon = ActivityMain.context.getResources().getDrawable(R.drawable.icon_consumables, null);
-        Drawable modificationsIcon = ActivityMain.context.getResources().getDrawable(R.drawable.icon_modifications, null);
-        Drawable shadersIcon = ActivityMain.context.getResources().getDrawable(R.drawable.icon_shaders, null);
-
-        inventoryTabs = view.findViewById(R.id.select_inventory_tabs);
-        inventoryTabs.setupWithViewPager(inventoryViewPager);
-
         Objects.requireNonNull(inventoryTabs.getTabAt(0)).setIcon(consumablesIcon);
         Objects.requireNonNull(inventoryTabs.getTabAt(1)).setIcon(modificationsIcon);
         Objects.requireNonNull(inventoryTabs.getTabAt(2)).setIcon(shadersIcon);
 
+ */
+/*
         for (int i = 0; i < inventoryTabs.getTabCount(); i++){
             TabLayout.Tab tab = inventoryTabs.getTabAt(i);
             if (tab != null) {
@@ -120,7 +159,6 @@ public class FragmentInventorySelect extends Fragment {
         }
 
  */
-
     }
 
     public void buildEngrams () {
@@ -140,7 +178,7 @@ public class FragmentInventorySelect extends Fragment {
                         JSONObject item = characterInventory.getJSONArray("items").getJSONObject(i);
                         String bucketHash = item.getString("bucketHash");
                         if (bucketHash.equals(engramBucketHash)) {
-                            Log.d("Engram", item.toString());
+                            //Log.d("Engram", item.toString());
                             engrams.put(item);
                             Message message = new Message();
                             message.what = UPDATE_ENGRAM_ADAPTER;
@@ -241,13 +279,22 @@ public class FragmentInventorySelect extends Fragment {
                 String countText = count + "/" + maxCount;
                 groupCount.setText(countText);
 
+                int spanCount = 3;
+
                 RecyclerView recyclerView = viewGroup.findViewById(R.id.select_inventory_pager_recycler);
-                recyclerView.setLayoutManager(new GridLayoutManager(mContext, 4));
+                recyclerView.setLayoutManager(new GridLayoutManager(mContext, spanCount));
+
+                int spacing = 50; //todo calculate spacing view width minus 3 x 22% screen width cubes divided by 2
+                boolean includeEdge = false;
+                recyclerView.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
+
                 inventoryAdapter = new InventoryAdapter(mContext,
                         sortedIntoBuckets.getJSONObject(pagerItems.names().getString(position)).getJSONArray("items"));
                 recyclerView.setAdapter(inventoryAdapter);
 
                 collection.addView(viewGroup);
+                //set tab icon
+                //Objects.requireNonNull(inventoryTabs.getTabAt(position)).setIcon(tabIcons.get(position));
 
             } catch (Exception e) {
                 Log.d("Inventory Adapter", Log.getStackTraceString(e));
@@ -286,7 +333,11 @@ public class FragmentInventorySelect extends Fragment {
 
         @Override
         @NonNull public InventoryAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
-            final View view = layoutInflater.inflate(R.layout.inventory_item_layout, parent, false);
+            final View view = layoutInflater.inflate(R.layout.thumbnail_layout, parent, false);
+            Display display = ActivityCharacter.context.getWindowManager().getDefaultDisplay();
+            int width = display.getWidth();
+            view.getLayoutParams().height = (int) (width * .22);
+            view.getLayoutParams().width = (int) (width * .22);
             return new ViewHolder(view);
         }
 
@@ -298,6 +349,16 @@ public class FragmentInventorySelect extends Fragment {
                 final String itemHash = dataArray.getJSONObject(position).getString("itemHash");
                 holder.itemTextView.setText(quantity);
                 new LoadInventoryImages(holder.itemImageView).execute(itemHash);
+
+                //Log.d("item", dataArray.getJSONObject(position).toString());
+                holder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(ActivityCharacter.context, ActivityItem.class);
+                        intent.putExtra("itemHash", itemHash);
+                        ActivityCharacter.context.startActivity(intent);
+                    }
+                });
             } catch (Exception e){
                 Log.d("onBind", Log.getStackTraceString(e));
             }
@@ -312,17 +373,11 @@ public class FragmentInventorySelect extends Fragment {
             TextView itemTextView;
             ImageView itemElementImageView;
             ImageView itemImageView;
+            View view;
 
             ViewHolder(final View itemView) {
                 super(itemView);
-                itemView.setTag(this);
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) itemView.getTag();
-                        Log.d("Click!", String.valueOf(viewHolder.getAdapterPosition()));
-                    }
-                });
+                view = itemView;
                 itemTextView = itemView.findViewById(R.id.inventory_item_number);
                 itemElementImageView = itemView.findViewById(R.id.inventory_item_element);
                 itemImageView = itemView.findViewById(R.id.inventory_item_image);
@@ -341,14 +396,17 @@ public class FragmentInventorySelect extends Fragment {
         @NonNull public EngramsAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
             View view = LayoutInflater
                     .from(parent.getContext())
-                    .inflate(R.layout.inventory_item_layout, parent, false);
+                    .inflate(R.layout.thumbnail_layout, parent, false);
+            Display display = ActivityCharacter.context.getWindowManager().getDefaultDisplay();
+            int width = display.getWidth();
+            view.getLayoutParams().width = (int) (width*.22);
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             try {
-                String itemHash = dataArray.getJSONObject(position).getString("itemHash");
+                final String itemHash = dataArray.getJSONObject(position).getString("itemHash");
                 String itemInstanceId = dataArray.getJSONObject(position).getString("itemInstanceId");
                 JSONObject itemInstance = ActivityMain.context.character.getItemInstances().getJSONObject(itemInstanceId);
                 //Log.d("Instance", itemInstance.toString());
@@ -363,6 +421,14 @@ public class FragmentInventorySelect extends Fragment {
                 new LoadImages(holder.itemImageView).execute(iconUrl);
                 holder.itemImageView.setBackground(null);
                 holder.itemBackground.setVisibility(View.INVISIBLE);
+                holder.view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(ActivityCharacter.context, ActivityItem.class);
+                        intent.putExtra("itemHash", itemHash);
+                        ActivityCharacter.context.startActivity(intent);
+                    }
+                });
             } catch (Exception e){
                 Log.d("onBind", Log.getStackTraceString(e));
             }
@@ -378,17 +444,11 @@ public class FragmentInventorySelect extends Fragment {
             ImageView itemElementImageView;
             ImageView itemImageView;
             ImageView itemBackground;
+            View view;
 
             ViewHolder(final View itemView) {
                 super(itemView);
-                itemView.setTag(this);
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) itemView.getTag();
-                        Toast.makeText(ActivityCharacter.context, "Click! " + viewHolder.getAdapterPosition(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                view = itemView;
                 itemTextView = itemView.findViewById(R.id.inventory_item_number);
                 itemElementImageView = itemView.findViewById(R.id.inventory_item_element);
                 itemImageView = itemView.findViewById(R.id.inventory_item_image);
@@ -397,7 +457,60 @@ public class FragmentInventorySelect extends Fragment {
         }
     }
 
+    static class PageSelectAdapter extends RecyclerView.Adapter<PageSelectAdapter.ViewHolder> {
+        private LayoutInflater layoutInflater;
+        private ArrayList<Drawable> dataArray;
 
+        PageSelectAdapter(Context context, ArrayList<Drawable> data){
+            this.layoutInflater = LayoutInflater.from(context);
+            this.dataArray = data;
+        }
+
+        @Override
+        @NonNull public PageSelectAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
+            final View view = layoutInflater.inflate(R.layout.thumbnail_layout, parent, false);
+            int width = parent.getWidth();
+            view.getLayoutParams().height = width;
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            try {
+                holder.itemImageView.setBackground(null);
+                holder.itemImageView.setImageBitmap(((BitmapDrawable) dataArray.get(position)).getBitmap());
+            } catch (Exception e){
+                Log.d("onBind", Log.getStackTraceString(e));
+            }
+        }
+        @Override
+        public int getItemCount() {
+            return dataArray.size();
+        }
+
+        private class ViewHolder extends RecyclerView.ViewHolder {
+
+            TextView itemTextView;
+            ImageView itemElementImageView;
+            ImageView itemImageView;
+
+            ViewHolder(final View itemView) {
+                super(itemView);
+                itemView.setTag(this);
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) itemView.getTag();
+                        inventoryViewPager.setCurrentItem(viewHolder.getAdapterPosition());
+                        Log.d("Click!", String.valueOf(viewHolder.getAdapterPosition()));
+                    }
+                });
+                itemTextView = itemView.findViewById(R.id.inventory_item_number);
+                itemElementImageView = itemView.findViewById(R.id.inventory_item_element);
+                itemImageView = itemView.findViewById(R.id.inventory_item_image);
+            }
+        }
+    }
 
     static class LoadInventoryImages extends AsyncTask<String, Void, Bitmap> {
 
@@ -494,4 +607,38 @@ public class FragmentInventorySelect extends Fragment {
         }
     }
 
+    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+
+        private int spanCount;
+        private int spacing;
+        private boolean includeEdge;
+
+        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+            this.spanCount = spanCount;
+            this.spacing = spacing;
+            this.includeEdge = includeEdge;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int position = parent.getChildAdapterPosition(view); // item position
+            int column = position % spanCount; // item column
+
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
+                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
+
+                if (position < spanCount) { // top edge
+                    outRect.top = spacing;
+                }
+                outRect.bottom = spacing; // item bottom
+            } else {
+                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
+                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
+                if (position >= spanCount) {
+                    outRect.top = spacing; // item top
+                }
+            }
+        }
+    }
 }

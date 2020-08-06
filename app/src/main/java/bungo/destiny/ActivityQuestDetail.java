@@ -179,8 +179,7 @@ public class ActivityQuestDetail extends AppCompatActivity {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             viewHolder = holder;
             try {
-                String itemHash = data.getJSONObject(position).getString("itemHash");
-                //String quantity = data.getJSONObject(position).getString("quantity");
+                final String itemHash = data.getJSONObject(position).getString("itemHash");
 
                 String signedHash = ActivityMain.context.getSignedHash(itemHash);
                 JSONObject itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyInventoryItemDefinition"));
@@ -190,6 +189,14 @@ public class ActivityQuestDetail extends AppCompatActivity {
                 holder.rewardTextView.setText(name);
                 new LoadImages(holder.rewardIconImageView).execute(icon);
 
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(ActivityCharacter.context, ActivityItem.class);
+                        intent.putExtra("itemHash", itemHash);
+                        ActivityCharacter.context.startActivity(intent);
+                    }
+                });
             } catch (Exception e) {
                 Log.d("Reward", Log.getStackTraceString(e));
             }
@@ -203,11 +210,13 @@ public class ActivityQuestDetail extends AppCompatActivity {
         static class ViewHolder extends RecyclerView.ViewHolder {
             ImageView rewardIconImageView;
             TextView rewardTextView;
+            View itemView;
 
             ViewHolder(final View itemView) {
                 super(itemView);
                 rewardIconImageView = itemView.findViewById(R.id.reward_icon);
                 rewardTextView = itemView.findViewById(R.id.reward_text);
+                this.itemView = itemView;
             }
         }
     }

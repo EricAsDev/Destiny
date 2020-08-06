@@ -30,7 +30,6 @@ import android.widget.Toast;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -96,7 +95,7 @@ public class ActivityMain extends AppCompatActivity {
         final FragmentCharacterSelect fragmentCharacterSelect = new FragmentCharacterSelect();
         //final FragmentClan fragmentClanSelect = new FragmentClan();
         final FragmentRanks fragmentRanks = new FragmentRanks();
-        final FragmentInventorySelect fragmentInventorySelect = new FragmentInventorySelect();
+        final FragmentInventory fragmentInventory = new FragmentInventory();
         fragmentVaultSelect = new FragmentVault();
 
         viewPager = findViewById(R.id.main_viewPager);

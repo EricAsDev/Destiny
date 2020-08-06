@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
@@ -256,7 +254,7 @@ public class ActivityAllPursuits extends AppCompatActivity {
                 holder.quantityTextView.setText(null);
                 holder.progressBar.setVisibility(View.INVISIBLE);
                 holder.iconImageView.setImageDrawable(getResources().getDrawable(R.drawable.missing_icon_d2, null));
-                holder.gearTint.setBackground(getResources().getDrawable(R.drawable.customborder, ActivityCharacter.context.getTheme()));
+                holder.gearTint.setBackground(getResources().getDrawable(R.drawable.custom_border, ActivityCharacter.context.getTheme()));
                 holder.completeImageView.setVisibility(View.INVISIBLE);
 
                 int quantity = inventoryItem.getInt("quantity");

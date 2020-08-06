@@ -159,11 +159,11 @@ public class FragmentPostmaster extends Fragment {
                     for (int i = 0; i < profileInventory.length(); i++){
                         if (profileInventory.getJSONObject(i).getString("bucketHash").equals(postmasterHash)) {
                             postmasterItems.put(profileInventory.getJSONObject(i));
-                            Log.d("Postmaster", profileInventory.getJSONObject(i).toString());
+                            //Log.d("Postmaster", profileInventory.getJSONObject(i).toString());
                         }
                     }
                 } catch (Exception e) {
-                    Log.d("Build Vault", e.toString());
+                    Log.d("Build Postmaster", Log.getStackTraceString(e));
                 }
 
                 Message message = new Message();
@@ -213,7 +213,7 @@ public class FragmentPostmaster extends Fragment {
         public PostmasterViewHolder onCreateViewHolder (ViewGroup viewGroup, final int viewType) {
             View view = LayoutInflater
                     .from(viewGroup.getContext())
-                    .inflate(R.layout.character_equipped_layout, viewGroup, false);
+                    .inflate(R.layout.quest_item_layout, viewGroup, false);
             return new PostmasterViewHolder(view);
         }
 
@@ -264,7 +264,7 @@ public class FragmentPostmaster extends Fragment {
                 });
 
             } catch (Exception e) {
-                Log.d("Postmaster Adapter", e.toString());
+                Log.d("Postmaster Adapter", Log.getStackTraceString(e));
             }
         }
 
@@ -314,7 +314,7 @@ public class FragmentPostmaster extends Fragment {
                     }
                     Log.d("Server Response", response.toString());
                 } catch (Exception e) {
-                    Log.d("transfer from vault", e.toString());
+                    Log.d("transfer from vault", Log.getStackTraceString(e));
                 }
             }
         });

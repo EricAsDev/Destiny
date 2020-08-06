@@ -22,12 +22,13 @@
     <string name="placeholder_clan_constant">clan // </string>
 
     <string name="menu_vault">Vault</string>
-    <string name="menu_crucible_rank">Crucible Ranks</string>
+    <string name="menu_crucible_rank">Ranks</string>
     <string name="menu_inventory">Inventory</string>
-    <string name="menu_crucible">Crucible Ranks</string>
+    <string name="menu_crucible">Ranks</string>
     <string name="menu_triumphs">Triumphs &amp; Seals</string>
     <string name="menu_gear">Gear</string>
     <string name="menu_loadouts">Loadouts</string>
+    <string name="menu_pursuits">Pursuits</string>
     <string name="menu_postmaster">Postmaster</string>
 
     <string name="character_power">Power</string>

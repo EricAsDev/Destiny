@@ -20,7 +20,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -171,7 +170,7 @@ public class FragmentPursuits extends Fragment {
                     gradientDrawable.setStroke(5, Color.parseColor("#d4af37"));
                     holder.gearTint.setBackground(gradientDrawable);
                 } else {
-                    holder.gearTint.setBackground(getResources().getDrawable(R.drawable.customborder));
+                    holder.gearTint.setBackground(getResources().getDrawable(R.drawable.custom_border));
                 }
 
                 ImageView iconImageView = holder.includeView.findViewById(R.id.inventory_item_image);

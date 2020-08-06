@@ -17,23 +17,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        app:layout_constraintWidth_percent=".45"
-        app:layout_constrainedWidth="true"
-        android:background="@android:color/darker_gray"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/pursuits_title"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <TextView
         android:id="@+id/pursuits_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:layout_marginStart="15dp"
+        android:layout_marginTop="50dp"
+        android:text="@string/menu_pursuits"
         android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

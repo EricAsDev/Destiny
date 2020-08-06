@@ -298,6 +298,8 @@ public class FragmentVault extends Fragment {
             private TextView type;
             private TextView itemPower;
 
+            private View itemView;
+
             private VaultViewHolder (final View view) {
                 super(view);
                 inventoryItemImage = view.findViewById(R.id.inventory_item_image);
@@ -310,42 +312,8 @@ public class FragmentVault extends Fragment {
                 type = view.findViewById(R.id.type);
                 itemPower = view.findViewById(R.id.item_power);
 
-                view.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        try {
-                            String itemInstanceId = inventoryListFiltered.get(getAdapterPosition()).getItemInstanceId();
+                itemView = view;
 
-//todo use itemCategoryHashes to determine item display activity/layout
-                            /*
-                            String itemHash = inventoryListFiltered.get(getAdapterPosition()).getItemHash();
-                            String signedItemHash = ActivityMain.context.getSignedHash(itemHash);
-                            JSONObject itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedItemHash, "DestinyInventoryItemDefinition"));
-                            Log.d("Item Definition", itemDefinition.getJSONArray("itemCategoryHashes").toString());
-                            */
-
-                            JSONObject profileInventoryObject = profile.getProfileInventory();
-                            JSONArray profileInventory = profileInventoryObject.getJSONObject("data").getJSONArray("items");
-                            for (int i = 0; i < profileInventory.length(); i++) {
-                                if (profileInventory.getJSONObject(i).has("itemInstanceId")) {
-                                    if (profileInventory.getJSONObject(i).getString("itemInstanceId").equals(itemInstanceId)) {
-                                        Log.d("Found", itemInstanceId);
-                                        String instanceString = String.valueOf(profileInventory.getJSONObject(i));
-                                        Intent intent = new Intent(ActivityMain.context, ActivityItem.class);
-                                        intent.putExtra("instanceString", instanceString);
-                                        ActivityMain.context.startActivity(intent);
-                                        break;
-                                    }
-                                } else {
-                                    Log.d("Missing itemInstanceId", profileInventory.getJSONObject(i).toString());
-                                }
-                            }
-                        } catch (Exception e) {
-                            Log.d("Long Click Item", e.toString());
-                        }
-                        return true;
-                    }
-                });
             }
         }
 
@@ -365,7 +333,7 @@ public class FragmentVault extends Fragment {
         @Override
         public void onBindViewHolder (@NonNull VaultAdapter.VaultViewHolder vaultViewHolder, final int position) {
             try {
-                InventoryObjects inventoryObject = inventoryListFiltered.get(position);
+                final InventoryObjects inventoryObject = inventoryListFiltered.get(position);
 
                 String icon = inventoryObject.getIcon();
                 String name = inventoryObject.getName();
@@ -398,6 +366,36 @@ public class FragmentVault extends Fragment {
                 } else {
                     vaultViewHolder.ammunitionTypeIcon.setImageBitmap(null);
                 }
+
+                vaultViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        try {
+                            JSONObject profileInventoryObject = profile.getProfileInventory();
+                            JSONArray profileInventory = profileInventoryObject.getJSONObject("data").getJSONArray("items");
+                            if (!itemInstanceId.equals("")) {
+                                for (int i = 0; i < profileInventory.length(); i++) {
+                                    if (profileInventory.getJSONObject(i).has("itemInstanceId")) {
+                                        if (profileInventory.getJSONObject(i).getString("itemInstanceId").equals(itemInstanceId)) {
+                                            Intent intent = new Intent(ActivityMain.context, ActivityItem.class);
+                                            intent.putExtra("instanceString", profileInventory.getJSONObject(i).toString());
+                                            ActivityMain.context.startActivity(intent);
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                Intent intent = new Intent(ActivityMain.context, ActivityItem.class);
+                                intent.putExtra("itemHash", itemHash);
+                                ActivityMain.context.startActivity(intent);
+                            }
+                        }
+                        catch (Exception e) {
+                            Log.d("Item Click", e.toString());
+                        }
+                    }
+                });
+
 //todo inventory item transferStatus enum to determine transfer eligible
                 vaultViewHolder.transferIcon.setOnClickListener(new View.OnClickListener() {
                     @Override
