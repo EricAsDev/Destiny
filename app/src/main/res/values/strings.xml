@@ -7,6 +7,7 @@
     <string name="stats_url">https://stats.bungie.net/Platform/</string>
     <string name="request_auth_url">https://www.bungie.net/en/oauth/authorize?client_id=</string>
     <string name="request_token_url">https://www.bungie.net/platform/app/oauth/token/</string>
+
     <string name="heavy_ammo_icon_url">/img/destiny_content/ammo_types/heavy.png</string>
     <string name="special_ammo_icon_url">/img/destiny_content/ammo_types/special.png</string>
     <string name="primary_ammo_icon_url">/img/destiny_content/ammo_types/primary.png</string>
@@ -30,20 +31,6 @@
     <string name="menu_loadouts">Loadouts</string>
     <string name="menu_pursuits">Pursuits</string>
     <string name="menu_postmaster">Postmaster</string>
-
-    <string name="character_power">Power</string>
-    <string name="character_power_value">100</string>
-    <string name="character_mobility">Mobility</string>
-    <string name="character_resilience">Resilience</string>
-    <string name="character_recovery">Recovery</string>
-
-    <string name="character_mobility_value">0</string>
-    <string name="character_resilience_value">0</string>
-    <string name="character_recovery_value">0</string>
-
-    <string name="item_name">Item Name Holder</string>
-    <string name="item_type">Item Type Holder</string>
-    <string name="item_power">500</string>
 
     <string name="ts_fragment">Triumphs</string>
     <string name="ts_seals">Seals</string>
@@ -91,9 +78,5 @@
     <string name="crucible_bravo">Bravo</string>
 
     <string name="rewards_title">REWARDS:</string>
-    
-    <string name="inventory_filtering.bounty">Bounties</string>
-    <string name="inventory_filtering.quest">Quests</string>
-    <string name="inventory_filtering.quest.featured">Featured</string>
 
 </resources>

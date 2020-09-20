@@ -47,8 +47,8 @@ public class ActivityCharacter extends AppCompatActivity {
         viewPagerAdapter.addFragment(new FragmentLoadouts());
         viewPagerAdapter.addFragment(new FragmentGearSelect());
         viewPagerAdapter.addFragment(new FragmentPursuits());
-        viewPagerAdapter.addFragment(new FragmentPostmaster());
-        viewPagerAdapter.addFragment(new FragmentInventory()); //fragment causes crash leaving character and re-entering
+        //viewPagerAdapter.addFragment(new FragmentPostmaster());
+        viewPagerAdapter.addFragment(new FragmentInventory());
         viewPagerAdapter.notifyDataSetChanged();
 
         viewPager.setCurrentItem(1);
