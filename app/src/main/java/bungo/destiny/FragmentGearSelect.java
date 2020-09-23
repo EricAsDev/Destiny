@@ -120,7 +120,6 @@ public class FragmentGearSelect extends Fragment {
                     case 400:
                         //todo update equipped and unequipped inventory
                         //todo refresh view
-
                         ActivityMain.threadPoolExecutor.execute(new Runnable() {
                             @Override
                             public void run() {
@@ -198,10 +197,11 @@ public class FragmentGearSelect extends Fragment {
                         JSONObject statDefinition = new JSONObject(ActivityMain.context.defineElement(signedStatHash, "DestinyStatDefinition"));
                         String icon = statDefinition.getJSONObject("displayProperties").getString("icon");
                         String value = stats.getString(statHash);
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("icon", icon);
-                        jsonObject.put("value", value);
-                        statsObject.put(statHash, jsonObject);
+                        JSONObject singleStatObject = new JSONObject();
+                        singleStatObject.put("icon", icon);
+                        singleStatObject.put("value", value);
+
+                        statsObject.put(statHash, singleStatObject);
                     }
                     new LoadImages(bannerBackground).execute(secondarySpecial);
                 } catch (Exception e) {
@@ -226,7 +226,7 @@ public class FragmentGearSelect extends Fragment {
         return null;
     }
 
-    void sortUnequippedItems() {
+    void sortUnequippedItems () {
         ActivityMain.threadPoolExecutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -665,11 +665,11 @@ public class FragmentGearSelect extends Fragment {
         }
     }
 
-    public class StatsAdapter extends RecyclerView.Adapter<StatsAdapter.StatsViewHolder> {
+    static public class StatsAdapter extends RecyclerView.Adapter<StatsAdapter.StatsViewHolder> {
 
         JSONObject statsRecyclerData;
 
-        class StatsViewHolder extends RecyclerView.ViewHolder {
+        static class StatsViewHolder extends RecyclerView.ViewHolder {
             private ImageView statIconImageView;
             private TextView statValueTextView;
 
@@ -677,7 +677,6 @@ public class FragmentGearSelect extends Fragment {
                 super(view);
                 statIconImageView = view.findViewById(R.id.character_stat_icon);
                 statValueTextView = view.findViewById(R.id.character_stat_value);
-
             }
         }
 
@@ -760,6 +759,4 @@ public class FragmentGearSelect extends Fragment {
             }
         }
     }
-
-
 }

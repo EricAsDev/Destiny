@@ -210,4 +210,30 @@ class Data {
         JSONObject getClanData () {return this.clanData;}
     }
 
+    class Ammunition {
+        JSONObject ammoObject = new JSONObject();
+
+        JSONObject getAmmoData (int ammoInt) {
+            try {
+                switch (ammoInt) {
+                    case 1:
+                        ammoObject.put("name", "Primary");
+                        ammoObject.put("icon", "/img/destiny_content/ammo_types/primary.png");
+                        break;
+                    case 2:
+                        ammoObject.put("name", "Special");
+                        ammoObject.put("icon", "/img/destiny_content/ammo_types/special.png");
+                        break;
+                    case 3:
+                        ammoObject.put("name", "Heavy");
+                        ammoObject.put("icon", "/img/destiny_content/ammo_types/heavy.png");
+                        break;
+                }
+            } catch (Exception e) {
+                Log.d("Ammo", Log.getStackTraceString(e));
+            }
+            return ammoObject;
+        }
+    }
+
 }

@@ -9,11 +9,10 @@
         android:id="@+id/socket_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
         android:textColor="@android:color/white"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        android:text="TextView" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/socket_list"

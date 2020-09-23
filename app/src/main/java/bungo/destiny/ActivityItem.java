@@ -1,5 +1,6 @@
 package bungo.destiny;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.text.LoginFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
@@ -38,7 +37,6 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -52,14 +50,14 @@ public class ActivityItem extends AppCompatActivity {
     JSONArray sockets;
     JSONArray socketCategories;
     JSONArray socketEntries;
-    JSONArray ammoTypes;
+    //JSONArray ammoTypes;
 
     RecyclerView.LayoutManager statsLayoutManager;
     StatsAdapter statsAdapter;
     RecyclerView statsRecycler;
 
     RecyclerView.LayoutManager categoryLayoutManager;
-    SocketCategory socketsCategories;
+    SocketCategoryAdapter socketsCategories;
     RecyclerView socketCategoryRecycler;
 
     SocketAdapter socketAdapter;
@@ -72,9 +70,11 @@ public class ActivityItem extends AppCompatActivity {
     final int UPDATE_PLUGS = 104;
 
     String itemHash;
+    /*
     String kineticURL = "/img/destiny_content/ammo_types/primary.png";
     String specialURL = "/img/destiny_content/ammo_types/special.png";
     String heavyURL = "/img/destiny_content/ammo_types/heavy.png";
+     */
 
     JSONArray statsDisplay;
     JSONObject instanceData;
@@ -86,6 +86,9 @@ public class ActivityItem extends AppCompatActivity {
     private List<String> itemCategoryList = new ArrayList<>(Arrays.asList(
             "1", "18", "19", "20", "34", "35", "39", "40",
             "41", "42", "43", "51", "55", "56", "57", "59"));
+
+    Data data = new Data();
+    Data.Ammunition ammunition = data.new Ammunition();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,66 +106,94 @@ public class ActivityItem extends AppCompatActivity {
                 JSONObject instanceString = new JSONObject(receivedIntent.getStringExtra("instanceString"));
                 itemHash = instanceString.getString("itemHash");
                 instanceData = instanceString;
-                Log.d("Instance String", instanceString.toString());
+                //Log.d("Instance String", instanceString.toString());
                 int state = instanceData.getInt("state");
                 ImageView inventoryItemBackground = findViewById(R.id.inventory_item_background);
-                if (state == 4) {
+                int FLAG_3 = 1<<2;
+                if (0 != (state & FLAG_3)) {
                     inventoryItemBackground.setColorFilter(Color.parseColor("#a0f5c242"));
+                    Log.d("MASTERWORK", itemHash);
                 }
+/*
+                //flag testing
+                int FLAG_1 = 1<<0;
+                int FLAG_2 = 1<<1;
+                int FLAG_3 = 1<<2;
+                int FLAG_4 = 1<<3;
+
+                for (int X = 0; X < 10; X++) {
+
+                    if (0 != (X & FLAG_1)) {
+                        Log.d("BITMASK TEST " + X, "flag 1");
+                    }
+                    if (0 != (X & FLAG_2)) {
+                        Log.d("BITMASK TEST " + X, "flag 2");
+                    }
+                    if (0 != (X & FLAG_3)) {
+                        Log.d("BITMASK TEST " + X, "flag 4");
+                    }
+                    if (0 != (X & FLAG_4)) {
+                        Log.d("BITMASK TEST " + X, "flag 8");
+                    }
+                }
+
+
+
+ */
             } catch (Exception e) {
                 Log.d("Instance String", Log.getStackTraceString(e));
             }
         }
 
         try {
-            ammoTypes = new JSONArray();
-            ammoTypes.put(null);
-            ammoTypes.put(kineticURL);
-            ammoTypes.put(specialURL);
-            ammoTypes.put(heavyURL);
-            ammoTypes.put(null);
-
             String signedHash = ActivityMain.context.getSignedHash(itemHash);
+            Log.d("signed hash", signedHash);
             JSONObject itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyInventoryItemDefinition"));
             JSONArray itemCategoryHashes = itemDefinition.getJSONArray("itemCategoryHashes");
+
+            LoadTitle(itemDefinition);
+
             List<String> itemCategories = new ArrayList<>();
 
             for (int i = 0; i < itemCategoryHashes.length(); i++) {
                 itemCategories.add(itemCategoryHashes.getString(i));
             }
+
             itemCategoryList.retainAll(itemCategories);
-
-            if (itemCategoryList.get(0).equals("1")) {
+            if (itemCategoryList.get(0).equals("1") || itemCategoryList.get(0).equals("20")) {
+                String itemInstanceId = instanceData.getString("itemInstanceId");
                 findViewById(R.id.armor_weapon).setVisibility(View.VISIBLE);
                 findViewById(R.id.layout_weapon).setVisibility(View.VISIBLE);
                 getDefaultStats(itemDefinition);
                 getSocketCategories(itemHash);
-
-            } else if (itemCategoryList.get(0).equals("20")) {
-                findViewById(R.id.armor_weapon).setVisibility(View.VISIBLE);
-                findViewById(R.id.layout_weapon).setVisibility(View.VISIBLE);
-                getDefaultStats(itemDefinition);
-                getSocketCategories(itemHash);
+                getDefaultDetails(itemDefinition, itemInstanceId);
             }
-            LoadTitle(itemDefinition);
+
+            /*
+            if (itemCategories.size() > 0) {
+                for (int i = 0; i < itemCategoryHashes.length(); i++) {
+                    itemCategories.add(itemCategoryHashes.getString(i));
+                }
+
+                itemCategoryList.retainAll(itemCategories);
+                if (itemCategoryList.get(0).equals("1") || itemCategoryList.get(0).equals("20")) {
+                    String itemInstanceId = instanceData.getString("itemInstanceId");
+                    findViewById(R.id.armor_weapon).setVisibility(View.VISIBLE);
+                    findViewById(R.id.layout_weapon).setVisibility(View.VISIBLE);
+                    getDefaultStats(itemDefinition);
+                    getSocketCategories(itemHash);
+                    getDefaultDetails(itemDefinition, itemInstanceId);
+                }
+            }
+
+             */
 
         } catch (Exception e) {
-            Log.d("Define Item", e.toString());
+            Log.d("Define Item", Log.getStackTraceString(e));
         }
 
         statsDisplay = new JSONArray();
         //String state;
-
-        /*
-        RecyclerView perksRecycler = findViewById(R.id.perks);
-        ImageView icon = findViewById(R.id.icon);
-        ImageView element = findViewById(R.id.element);
-        ImageView ammoType = findViewById(R.id.ammo_type);
-        TextView name = findViewById(R.id.name);
-        TextView displayType = findViewById(R.id.display_type);
-        TextView lightLevel = findViewById(R.id.light_level);
-        TextView descriptionText = findViewById(R.id.description);
-         */
 
         statsRecycler = findViewById(R.id.stats);
         statsLayoutManager = new LinearLayoutManager(this.getApplicationContext());
@@ -172,62 +203,6 @@ public class ActivityItem extends AppCompatActivity {
         categoryLayoutManager = new LinearLayoutManager(this.getApplicationContext());
         socketCategoryRecycler.setLayoutManager(categoryLayoutManager);
 
-/*
-        try {
-            JSONObject inventoryItem = new JSONObject(instanceString);
-
-            itemHash = inventoryItem.getString("itemHash");
-            itemInstanceId = inventoryItem.getString("itemInstanceId");
-            state = inventoryItem.getString("state");
-            String bucketHash = inventoryItem.getString("bucketHash");
-            String signedBucketHash = ActivityMain.context.getSignedHash(bucketHash);
-            JSONObject bucketObject = new JSONObject(ActivityMain.context.defineElement(signedBucketHash, "DestinyInventoryBucketDefinition"));
-            Log.d("Bucket Location", bucketObject.getString("location"));
-
-            String signedItemHash = ActivityMain.context.getSignedHash(itemHash);
-            JSONObject itemDefinition = new JSONObject(ActivityMain.context.defineElement(signedItemHash, "DestinyInventoryItemDefinition"));
-            Log.d("Item Definition", itemDefinition.names().toString());
-
-            String nameText = itemDefinition.getJSONObject("displayProperties").getString("name");
-            String iconText = itemDefinition.getJSONObject("displayProperties").getString("icon");
-            String itemDisplayName = itemDefinition.getString("itemTypeDisplayName");
-
-            JSONObject instanceData;
-            if (bucketObject.getString("location").equals("1")) {
-                instanceData = ActivityMain.context.character.getItemInstances()
-                        .getJSONObject(itemInstanceId);
-            } else {
-                instanceData = ActivityMain.context.profile.getItemComponents()
-                        .getJSONObject("instances")
-                        .getJSONObject("data")
-                        .optJSONObject(itemInstanceId);
-            }
-            String damageTypeHash = instanceData.optString("damageTypeHash");
-            if (!damageTypeHash.isEmpty()) {
-                String signedDamageTypeHash = ActivityMain.context.getSignedHash(damageTypeHash);
-                JSONObject damageTypeDefinition = new JSONObject(ActivityMain.context.defineElement(signedDamageTypeHash, "DestinyDamageTypeDefinition"));
-                String elementIcon = damageTypeDefinition.getJSONObject("displayProperties").getString("icon");
-                //int state = equippedItems.getJSONObject(i).getInt("state");
-                int ammo = itemDefinition.getJSONObject("equippingBlock").getInt("ammoType");
-                ammoType.setImageBitmap(getAmmoIcon(ammo));
-                new LoadInventoryImages(element).execute(elementIcon);
-
-            }
-            String itemPower = "";
-            if (instanceData.has("primaryStat")) itemPower = instanceData.getJSONObject("primaryStat").getString("value");
-            String description = itemDefinition.getJSONObject("displayProperties").getString("description");
-
-            name.setText(nameText);
-            displayType.setText(itemDisplayName);
-            lightLevel.setText(itemPower);
-            descriptionText.setText(description);
-            new LoadInventoryImages(icon).execute(iconText);
-
-            getInstanceData(itemInstanceId);
-        } catch (Exception e) {
-            Log.d("Item - definition", e.toString());
-        }
-*/
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message inputMessage) {
@@ -261,7 +236,7 @@ public class ActivityItem extends AppCompatActivity {
                         break;
 
                     case SOCKETS_COMPLETE:
-                        socketsCategories = new SocketCategory(getApplicationContext(), socketCategories);
+                        socketsCategories = new SocketCategoryAdapter(getApplicationContext(), socketCategories);
                         socketCategoryRecycler.setAdapter(socketsCategories);
                         socketsCategories.notifyDataSetChanged();
                         break;
@@ -333,27 +308,44 @@ public class ActivityItem extends AppCompatActivity {
         }
     }
 
-    void getDefaultDetails (JSONObject itemDefinition) {
+    void getDefaultDetails (JSONObject itemDefinition, String itemInstanceId) {
         try {
-            ImageView ammoTypeIV = findViewById(R.id.ammo_type);
+            ImageView ammo = findViewById(R.id.ammo_type);
+            ImageView element = findViewById(R.id.element);
+            TextView level = findViewById(R.id.light_level);
+            TextView type = findViewById(R.id.display_type);
+            TextView stat_name = findViewById(R.id.stat_name);
+
             int ammoType = itemDefinition.getJSONObject("equippingBlock").getInt("ammoType");
-            if (ammoType >0 && ammoType < 4) {
-                String ammoURL = ammoTypes.getString(ammoType);
-                new LoadInventoryImages(ammoTypeIV).execute(ammoURL);
-            }
-            String defaultDamageTypeHash = itemDefinition.optString("defaultDamageTypeHash");
-            if (defaultDamageTypeHash != null) {
-                String signedHash = ActivityMain.context.getSignedHash(defaultDamageTypeHash);
-                JSONObject damageTypeDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyDamageTypeDefinition"));
-                String icon = damageTypeDefinition.getJSONObject("displayProperties").getString("icon");
-                ImageView element = findViewById(R.id.element_icon);
-                new LoadInventoryImages(element).execute(icon);
+            if (ammoType > 0 && ammoType < 4) {
+                JSONObject ammoObject = ammunition.getAmmoData(ammoType);
+                String ammoURL = ammoObject.getString("icon");
+                String ammoName = ammoObject.getString("name");
+                type.setText(ammoName);
+                new LoadInventoryImages(ammo).execute(ammoURL);
             }
 
+            JSONObject instanceData = ActivityMain.context.character.getItemInstances().getJSONObject(itemInstanceId);
+
+            String primaryStatHash = instanceData.getJSONObject("primaryStat").getString("statHash");
+            String primaryStatValue = instanceData.getJSONObject("primaryStat").getString("value");
+            String signedPrimaryStatHash = ActivityMain.context.getSignedHash(primaryStatHash);
+            JSONObject statDefinition = new JSONObject(ActivityMain.context.defineElement(signedPrimaryStatHash, "DestinyStatDefinition"));
+            String statName = statDefinition.getJSONObject("displayProperties").getString("name");
+
+            level.setText(primaryStatValue);
+            stat_name.setText(statName);
+
+            String damageTypeHash = instanceData.optString("damageTypeHash");
+            if (damageTypeHash != null) {
+                String signedHash = ActivityMain.context.getSignedHash(damageTypeHash);
+                JSONObject damageTypeDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyDamageTypeDefinition"));
+                String icon = damageTypeDefinition.getJSONObject("displayProperties").getString("icon");
+                new LoadInventoryImages(element).execute(icon);
+            }
         } catch (Exception e) {
             Log.d("Default Details", Log.getStackTraceString(e));
         }
-
     }
 
     void getDefaultStats (final JSONObject itemDefinition) {
@@ -481,6 +473,7 @@ public class ActivityItem extends AppCompatActivity {
 
                             //omitting these things because of crashes
                             if (!socketEntry.getBoolean("defaultVisible") || singleInitialItemHash.equals("0")) {
+                                Log.d("Creating Blank Object", socketEntry.toString());
                                 PlugObject plugObject = new PlugObject();
                                 plugObject.defaultVisible = socketEntry.getBoolean("defaultVisible");
                                 plugObjectList.add(plugObject);
@@ -488,24 +481,25 @@ public class ActivityItem extends AppCompatActivity {
                             };
 
                             String signedSingleInitialItemHash = ActivityMain.context.getSignedHash(singleInitialItemHash);
-                            Log.d(singleInitialItemHash, signedSingleInitialItemHash);
                             JSONObject socketDefinition = new JSONObject(ActivityMain.context.defineElement(signedSingleInitialItemHash, "DestinyInventoryItemDefinition"));
-                            Log.d("Socket Definition", socketDefinition.toString());
+
                             String icon = socketDefinition.getJSONObject("displayProperties").getString("icon");
                             String name = socketDefinition.getJSONObject("displayProperties").getString("name");
                             String description = socketDefinition.getJSONObject("displayProperties").getString("description");
                             String socketTypeHash = socketEntry.getString("socketTypeHash");
+
                             String signedSocketTypeHash = ActivityMain.context.getSignedHash(socketTypeHash);
                             JSONObject socketTypeDefinition = new JSONObject(ActivityMain.context.defineElement(signedSocketTypeHash, "DestinySocketTypeDefinition"));
                             JSONArray whiteList = socketTypeDefinition.getJSONArray("plugWhitelist");
 
-                            //TODO add for gains
+                            JSONArray investmentStats = socketDefinition.getJSONArray("investmentStats");
 
                             PlugObject plugObject = new PlugObject();
                             plugObject.name = name;
                             plugObject.description = description;
                             plugObject.icon = icon;
                             plugObject.whiteList = whiteList;
+                            plugObject.investmentStats = investmentStats;
 
                             plugObjectList.add(plugObject);
                         };
@@ -513,12 +507,10 @@ public class ActivityItem extends AppCompatActivity {
                         Message message = new Message();
                         message.what = SOCKETS_COMPLETE;
                         handler.sendMessage(message);
-
                     }
                 } catch (Exception e) {
                     Log.d("Socket Categories", Log.getStackTraceString(e));
                 }
-
             }
         });
     }
@@ -541,13 +533,10 @@ public class ActivityItem extends AppCompatActivity {
                         Log.d("Stats Object", stats.toString());
 
                         for (int i = 0; i < stats.names().length(); i++) {
-                            String statHash = stats.names().getString(i);
-
-                            for (int j = 0; j < statsObjectList.size(); j++) {
+                            String statHash = stats.names().getString(i);for (int j = 0; j < statsObjectList.size(); j++) {
                                 String defaultStat = statsObjectList.get(j).getStatHash();
                                 if (defaultStat.equals(statHash)) {
-                                    int instanceStatValue = stats.getJSONObject(stats.names().getString(i)).getInt("value");
-                                    statsObjectList.get(j).value = instanceStatValue;
+                                    statsObjectList.get(j).value = stats.getJSONObject(stats.names().getString(i)).getInt("value");
 
                                     Message message = new Message();
                                     message.what = UPDATE_STAT;
@@ -566,18 +555,11 @@ public class ActivityItem extends AppCompatActivity {
                         //}
 
                         //Sockets are found when configuring the item
-
-                        for (int i = 0; i < plugObjectList.size(); i++) {
-                            Log.d("Old Plug", plugObjectList.get(i).getName());
-                        }
-
                         for (int position = 0; position < sockets.length(); position++) {
                             if (!sockets.getJSONObject(position).has("plugHash")) continue;
                             String signedHash = ActivityMain.context.getSignedHash(sockets.getJSONObject(position).getString("plugHash"));
                             JSONObject plugDefinition = new JSONObject(ActivityMain.context.defineElement(signedHash, "DestinyInventoryItemDefinition"));
-
-                            Log.d("Plug Definition", plugDefinition.toString());
-
+                            JSONArray investmentStats = plugDefinition.getJSONArray("investmentStats");
                             //String plugCategoryHash = plugDefinition.getJSONObject("plug").getString("plugCategoryHash");
                             //Log.d(plugCategoryHash, plugObjectList.get(position).getWhiteList().toString());
                             String name = plugDefinition.getJSONObject("displayProperties").getString("name");
@@ -587,15 +569,12 @@ public class ActivityItem extends AppCompatActivity {
                             plugObjectList.get(position).name = name;
                             plugObjectList.get(position).description = description;
                             plugObjectList.get(position).icon = icon;
+                            plugObjectList.get(position).investmentStats = investmentStats;
 
                             Message message = new Message();
                             message.what = UPDATE_PLUGS;
                             handler.sendMessage(message);
 
-                        }
-
-                        for (int i = 0; i < plugObjectList.size(); i++) {
-                            Log.d("New Plug", plugObjectList.get(i).getName());
                         }
                     } else {
                         String errorMessage = response.getString("Message");
@@ -618,7 +597,7 @@ public class ActivityItem extends AppCompatActivity {
         String socketTypeHash;
         Boolean defaultVisible;
         JSONArray whiteList;
-        JSONArray gains;
+        JSONArray investmentStats;
 
         private String getName() {
             return name;
@@ -640,8 +619,8 @@ public class ActivityItem extends AppCompatActivity {
             return whiteList;
         }
 
-        private JSONArray getGains() {
-            return gains;
+        private JSONArray getInvestmentStats() {
+            return investmentStats;
         }
 
         private boolean getDefaultVisible() {
@@ -694,11 +673,11 @@ public class ActivityItem extends AppCompatActivity {
         private boolean getIsHidden () { return isHidden; }
     }
 
-    public class SocketCategory extends RecyclerView.Adapter<SocketCategory.ViewHolder> {
+    public class SocketCategoryAdapter extends RecyclerView.Adapter<SocketCategoryAdapter.ViewHolder> {
         JSONArray socketCategories;
         LayoutInflater layoutInflater;
 
-        SocketCategory(Context context, JSONArray socketCategories) {
+        SocketCategoryAdapter(Context context, JSONArray socketCategories) {
             try {
                 this.socketCategories = new JSONArray();
                 this.socketCategories = socketCategories;
@@ -715,12 +694,12 @@ public class ActivityItem extends AppCompatActivity {
                 super(itemView);
                 category = itemView.findViewById(R.id.socket_category);
                 socketsRecycler = itemView.findViewById(R.id.socket_list);
-            };
+            }
         }
 
         @Override
         @NonNull
-        public SocketCategory.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
+        public SocketCategoryAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
             View view = layoutInflater.inflate(R.layout.socket_group, parent, false);
             return new ViewHolder(view);
         }
@@ -733,31 +712,26 @@ public class ActivityItem extends AppCompatActivity {
                 String signedCategoryHash = ActivityMain.context.getSignedHash(socketCategoryHash);
                 JSONObject socketCategoryDefinition = new JSONObject(ActivityMain.context.defineElement(signedCategoryHash, "DestinySocketCategoryDefinition"));
                 String name = socketCategoryDefinition.getJSONObject("displayProperties").getString("name");
-                holder.category.setText(name);
 
                 JSONArray socketIndexes = socketCategories.getJSONObject(holderPosition).getJSONArray("socketIndexes");
 
-                JSONArray displaySockets = new JSONArray();
                 List<PlugObject> displayPlugs = new ArrayList<>();
                 for (int i = 0; i < socketIndexes.length(); i++) {
-                    //JSONObject socketEntry = socketEntries.getJSONObject(socketIndexes.getInt(i));
-                    //Log.d("Socket Entry", socketEntry.toString());
-                    displaySockets.put(socketEntries.getJSONObject(socketIndexes.getInt(i)));
                     PlugObject plugObject = new PlugObject();
 
                     plugObject.name = plugObjectList.get(socketIndexes.getInt(i)).getName();
                     plugObject.description = plugObjectList.get(socketIndexes.getInt(i)).getDescription();
                     plugObject.icon = plugObjectList.get(socketIndexes.getInt(i)).getIcon();
+                    plugObject.investmentStats = plugObjectList.get(socketIndexes.getInt(i)).getInvestmentStats();
 
                     displayPlugs.add(plugObject);
-
                 }
 
-                Log.d("Sockets", displaySockets.toString());
+                holder.category.setText(name);
                 RecyclerView.LayoutManager socketLayoutManager = new LinearLayoutManager(getApplicationContext());
                 holder.socketsRecycler.setLayoutManager(socketLayoutManager);
 
-                socketAdapter = new SocketAdapter(getApplicationContext(), displaySockets, displayPlugs);
+                socketAdapter = new SocketAdapter(getApplicationContext(), displayPlugs);
                 holder.socketsRecycler.setAdapter(socketAdapter);
                 socketAdapter.notifyDataSetChanged();
 
@@ -773,23 +747,70 @@ public class ActivityItem extends AppCompatActivity {
 
     }
 
-    static class SocketAdapter extends RecyclerView.Adapter<SocketAdapter.ViewHolder> {
-        JSONArray sockets;
-        List<PlugObject> plugObjects;
+    static class InvestmentStatsAdapter extends RecyclerView.Adapter<InvestmentStatsAdapter.ViewHolder> {
+        JSONArray investmentStats;
         LayoutInflater layoutInflater;
 
-        SocketAdapter(Context context, JSONArray sockets, List<PlugObject> plugs) {
-            this.plugObjects = plugs;
-            this.sockets = sockets;
-            this.layoutInflater = LayoutInflater.from(context);
+        InvestmentStatsAdapter(Context context, JSONArray data) {
+            this.investmentStats = data;
+            layoutInflater = LayoutInflater.from(context);
+        }
 
+        static class ViewHolder extends RecyclerView.ViewHolder {
+            TextView name;
+            TextView value;
+            private ViewHolder (View view) {
+                super(view);
+                name = view.findViewById(R.id.name);
+                value = view.findViewById(R.id.value);
+            }
+        }
+        @Override
+        @NonNull
+        public InvestmentStatsAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
+            View view = layoutInflater.inflate(R.layout.investment_stat_layout, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+            try {
+                final int holderPosition = holder.getAdapterPosition();
+                String value = investmentStats.getJSONObject(holderPosition).getString("value");
+                String statTypeHash = investmentStats.getJSONObject(holderPosition).getString("statTypeHash");
+                String signedStatTypeHash = ActivityMain.context.getSignedHash(statTypeHash);
+                JSONObject statTypeDefinition= new JSONObject(ActivityMain.context.defineElement(signedStatTypeHash, "DestinyStatDefinition"));
+                String name = statTypeDefinition.getJSONObject("displayProperties").getString("name");
+
+                holder.name.setText(name);
+                holder.value.setText(value);
+            } catch (Exception e) {
+                Log.d("InvestmentStatsAdapter", Log.getStackTraceString(e));
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return investmentStats.length();
+        }
+    }
+
+    static class SocketAdapter extends RecyclerView.Adapter<SocketAdapter.ViewHolder> {
+        List<PlugObject> plugObjects;
+        LayoutInflater layoutInflater;
+        Context context;
+
+        SocketAdapter(Context context, List<PlugObject> plugs) {
+            this.plugObjects = plugs;
+            this.context = context;
+            this.layoutInflater = LayoutInflater.from(context);
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
             ImageView icon;
             TextView name;
             TextView description;
-            RecyclerView gains;
+            RecyclerView investmentStats;
             View item;
 
             private ViewHolder (View itemView) {
@@ -797,9 +818,9 @@ public class ActivityItem extends AppCompatActivity {
                 icon = itemView.findViewById(R.id.icon);
                 name = itemView.findViewById(R.id.name);
                 description = itemView.findViewById(R.id.description);
-                gains = itemView.findViewById(R.id.gains);
+                investmentStats = itemView.findViewById(R.id.investmentStats);
                 item = itemView;
-            };
+            }
         }
 
         @Override
@@ -814,13 +835,6 @@ public class ActivityItem extends AppCompatActivity {
             try {
                 final int holderPosition = holder.getAdapterPosition();
 
-                String singleInitialItemHash = sockets.getJSONObject(holderPosition).getString("singleInitialItemHash");
-                String signedSingleInitialItemHash = ActivityMain.context.getSignedHash(singleInitialItemHash);
-                JSONObject socketDefinition = new JSONObject(ActivityMain.context.defineElement(signedSingleInitialItemHash, "DestinyInventoryItemDefinition"));
-                //String icon = socketDefinition.getJSONObject("displayProperties").getString("icon");
-                //String name = socketDefinition.getJSONObject("displayProperties").getString("name");
-                //String description = socketDefinition.getJSONObject("displayProperties").getString("description");
-
                 String icon = plugObjects.get(holderPosition).getIcon();
                 String name = plugObjects.get(holderPosition).getName();
                 String description = plugObjects.get(holderPosition).getDescription();
@@ -832,21 +846,33 @@ public class ActivityItem extends AppCompatActivity {
                     new LoadInventoryImages(holder.icon).execute(icon);
                 }
 
+                JSONArray investmentStats = plugObjects.get(holderPosition).getInvestmentStats();
+                if (investmentStats!=null && investmentStats.length() > 0) {
+                    RecyclerView investmentStatsRecycler = holder.investmentStats;
+                    investmentStatsRecycler.setVisibility(View.VISIBLE);
+                    InvestmentStatsAdapter investmentStatsAdapter = new InvestmentStatsAdapter(context, investmentStats);
+
+                    RecyclerView.LayoutManager investmentStatsLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+                    investmentStatsRecycler.setLayoutManager(investmentStatsLayoutManager);
+                    investmentStatsRecycler.setAdapter(investmentStatsAdapter);
+                    investmentStatsAdapter.notifyDataSetChanged();
+                }
+
                 holder.item.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Log.d("Plug list " + holderPosition, plugObjects.get(holderPosition).getName());
+                        Log.d("Plug list " + holderPosition, plugObjects.get(holderPosition).getIcon());
                     }
                 });
 
             } catch (Exception e) {
-                Log.d("Socket Adapter Adapter", Log.getStackTraceString(e));
+                Log.d("Socket Adapter", Log.getStackTraceString(e));
             }
         }
 
         @Override
         public int getItemCount() {
-            return sockets.length();
+            return plugObjects.size();
         }
 
     }
@@ -930,7 +956,7 @@ public class ActivityItem extends AppCompatActivity {
                             }
                         });
                         if (data.get(position).getIsHidden()) {
-                            viewHolderBar.nameView.setTextColor(Color.DKGRAY);
+                            viewHolderBar.nameView.setTextColor(Color.parseColor("#c3bcb4"));
                         } else {
                             viewHolderBar.nameView.setTextColor(Color.WHITE);
                         }
@@ -946,7 +972,7 @@ public class ActivityItem extends AppCompatActivity {
                         viewHolderNumber.nameView.setText(data.get(position).getName());
                         viewHolderNumber.valueView.setText(String.valueOf(data.get(position).getValue()));
                         if (data.get(position).getIsHidden()) {
-                            viewHolderNumber.nameView.setTextColor(Color.DKGRAY);
+                            viewHolderNumber.nameView.setTextColor(Color.parseColor("#c3bcb4"));
                         } else {
                             viewHolderNumber.nameView.setTextColor(Color.WHITE);
                         }
@@ -973,6 +999,7 @@ public class ActivityItem extends AppCompatActivity {
         @Override
         protected Bitmap doInBackground (String... params) {
             String iconUrl = params[0];
+            //Log.d("Icon URL", iconUrl);
             Bitmap icon;
             try {
                 iconUrl = iconUrl.replaceAll("'\'/", "/");
@@ -991,8 +1018,7 @@ public class ActivityItem extends AppCompatActivity {
                 }
 
             } catch (Exception e) {
-                Log.d("LoadInventoryImages", e.getMessage());
-                e.printStackTrace();
+                Log.d("LoadInventoryImages", Log.getStackTraceString(e));
             }
             return null;
         }
@@ -1007,4 +1033,5 @@ public class ActivityItem extends AppCompatActivity {
             }
         }
     }
+
 }

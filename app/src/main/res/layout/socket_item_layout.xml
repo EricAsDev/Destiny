@@ -25,8 +25,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/icon"
         android:textSize="20sp"
-        android:textColor="@android:color/white"
-        android:text="TextView" />
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/description"
@@ -36,11 +35,10 @@
         app:layout_constraintStart_toStartOf="@+id/name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/name"
-        android:textColor="@android:color/white"
-        android:text="TextView \nLine 2 \nLine 3 \nPossibly line 4" />
+        android:textColor="@android:color/white"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/gains"
+        android:id="@+id/investmentStats"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -48,4 +46,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description"
         android:visibility="gone"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
